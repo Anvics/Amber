@@ -18,7 +18,8 @@ Pod::Spec.new do |s|
 #   * Finally, don't worry about the indent, CocoaPods strips it!
 
   s.description      = <<-DESC
-Amber is flexible architecture based on Elm & Flux ideas and developed specifically for iOS.                       DESC
+Amber is flexible architecture based on Elm & Flux ideas and developed specifically for iOS.
+DESC
 
   s.homepage         = 'https://github.com/Anvics/Amber'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
