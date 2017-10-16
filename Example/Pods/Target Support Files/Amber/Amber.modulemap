@@ -1,0 +1,6 @@
+framework module Amber {
+  umbrella header "Amber-umbrella.h"
+
+  export *
+  module * { export * }
+}

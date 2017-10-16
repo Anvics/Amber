@@ -1,6 +1,8 @@
 use_frameworks!
+
 target 'Amber_Tests' do
   pod 'Amber', :path => '../'
+pod 'Bond', '~> 6.3.0'
   
   
 end

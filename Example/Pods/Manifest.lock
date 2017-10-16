@@ -1,0 +1,26 @@
+PODS:
+  - Amber (1.0.0):
+    - Bond (~> 6.3.0)
+  - Bond (6.3.0):
+    - Diff (~> 0.5.3)
+    - ReactiveKit (~> 3.6.2)
+  - Diff (0.5.3)
+  - ReactiveKit (3.6.2)
+
+DEPENDENCIES:
+  - Amber (from `../`)
+  - Bond (~> 6.3.0)
+
+EXTERNAL SOURCES:
+  Amber:
+    :path: ../
+
+SPEC CHECKSUMS:
+  Amber: 1b42c742404a1a93c7b338de2d11a7144ed4d810
+  Bond: 6a15b0635bbaae915d91b4c4ffa1396807530ef3
+  Diff: befa1d19c32726b2b36ce915d98793e2fbde8dcc
+  ReactiveKit: 59813e52505065d14fa77b453d8be5981eced6b7
+
+PODFILE CHECKSUM: 704a10f349a9a9541e3afda6346d8081831357c9
+
+COCOAPODS: 1.3.1

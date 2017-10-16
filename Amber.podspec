@@ -8,8 +8,8 @@
 
 Pod::Spec.new do |s|
   s.name             = 'Amber'
-  s.version          = '0.1.0'
-  s.summary          = 'A short description of Amber.'
+  s.version          = '1.0.0'
+  s.summary          = 'flexible and convenient iOS architecture based on Flex & Elm'
 
 # This description is used to generate tags and improve search results.
 #   * Think: What does it do? Why did you write it? What is the focus?
@@ -18,17 +18,18 @@ Pod::Spec.new do |s|
 #   * Finally, don't worry about the indent, CocoaPods strips it!
 
   s.description      = <<-DESC
-TODO: Add long description of the pod here.
+Amber is flexible and convenient iOS architecture based on Flex & Elm.
+It uses Reducer to process Actions and Router to process Transitions.
                        DESC
 
-  s.homepage         = 'https://github.com/Nikita Arkhipov/Amber'
-  # s.screenshots     = 'www.example.com/screenshots_1', 'www.example.com/screenshots_2'
+  s.homepage         = 'https://github.com/Anvics/Amber'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
-  s.author           = { 'Nikita Arkhipov' => 'narhipov92@gmail.com' }
-  s.source           = { :git => 'https://github.com/Nikita Arkhipov/Amber.git', :tag => s.version.to_s }
+  s.author           = { 'Nikita Arkhipov' => 'nikitarkhipov@gmail.com' }
+  s.source           = { :git => 'https://github.com/Anvics/Amber.git', :tag => s.version.to_s }
   # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
 
-  s.ios.deployment_target = '8.0'
+  s.ios.deployment_target = '9.0'
+#.swift-version = '3.2'
 
   s.source_files = 'Amber/Classes/**/*'
   
@@ -37,6 +38,6 @@ TODO: Add long description of the pod here.
   # }
 
   # s.public_header_files = 'Pod/Classes/**/*.h'
-  # s.frameworks = 'UIKit', 'MapKit'
-  # s.dependency 'AFNetworking', '~> 2.3'
+  s.frameworks = 'UIKit'
+  s.dependency 'Bond', '~> 6.3.0'
 end
