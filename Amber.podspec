@@ -24,7 +24,7 @@ DESC
   s.homepage         = 'https://github.com/Anvics/Amber'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
   s.author           = { 'Nikita Arkhipov' => 'nikitarkhipov@gmail.com' }
-  s.source           = { :git => 'https://github.com/Anvics/Amber.git', :branch => 'master' :tag => 1.0.2 }
+  s.source           = { :git => 'https://github.com/Anvics/Amber.git', :branch => 'master', :tag => 1.0.2 }
   # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
 
   s.ios.deployment_target = '9.0'
