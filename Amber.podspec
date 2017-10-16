@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'Amber'
-  s.version          = '1.0.0'
+  s.version          = '1.0.1'
   s.summary          = 'flexible and convenient iOS architecture based on Flex & Elm'
 
 # This description is used to generate tags and improve search results.
@@ -18,9 +18,7 @@ Pod::Spec.new do |s|
 #   * Finally, don't worry about the indent, CocoaPods strips it!
 
   s.description      = <<-DESC
-Amber is flexible and convenient iOS architecture based on Flex & Elm.
-It uses Reducer to process Actions and Router to process Transitions.
-                       DESC
+Amber is flexible architecture based on Elm & Flux ideas and developed specifically for iOS.                       DESC
 
   s.homepage         = 'https://github.com/Anvics/Amber'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
@@ -29,7 +27,6 @@ It uses Reducer to process Actions and Router to process Transitions.
   # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
 
   s.ios.deployment_target = '9.0'
-#.swift-version = '3.2'
 
   s.source_files = 'Amber/Classes/**/*'
   
