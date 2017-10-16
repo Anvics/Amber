@@ -16,7 +16,7 @@ public protocol AmberEmbedder {
     func embed<U: AmberController>(_ screen: U.Type, data: U.StoreState.RequiredData, view: UIView, input: U.OutputBlock?) -> U.InputBlock
 }
 
-extension AmberEmbedder{
+public extension AmberEmbedder{
     func embed<U: AmberController>(_ screen: U.Type, data: U.StoreState.RequiredData, view: UIView) -> U.InputBlock{
         return embed(screen, data: data, view: view, input: nil)
     }
@@ -41,7 +41,7 @@ public protocol AmberRoutePerformer: AmberEmbedder {
     func popToRoot()
 }
 
-extension AmberRoutePerformer{
+public extension AmberRoutePerformer{
     func replace<U: AmberController>(_ screen: U.Type, animation: UIViewAnimationOptions = .transitionCrossDissolve) where U.StoreState.RequiredData == Void{
         replace(screen, data: (), animation: animation)
     }
