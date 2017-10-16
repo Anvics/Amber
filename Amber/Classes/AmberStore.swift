@@ -28,14 +28,14 @@ public final class AmberStore<Reducer: AmberReducer>{
     typealias OutputActionBlock = (Reducer.OutputAction) -> Void
     typealias TransitionBlock = (Reducer.Transition) -> Void
     
-    init<R: AmberRouter>(reducer: Reducer, router: R) where R.Reducer == Reducer{
+    public init<R: AmberRouter>(reducer: Reducer, router: R) where R.Reducer == Reducer{
         self.reducer = reducer
         self.router = router.perform
         subscribe()
     }
     
     ///Use only for tests
-    init<R: AmberRouter>(reducer: Reducer, router: R, requiredData: Reducer.State.RequiredData) where R.Reducer == Reducer{
+    public init<R: AmberRouter>(reducer: Reducer, router: R, requiredData: Reducer.State.RequiredData) where R.Reducer == Reducer{
         self.reducer = reducer
         self.router = router.perform
         subscribe()
@@ -43,43 +43,43 @@ public final class AmberStore<Reducer: AmberReducer>{
         sharedInitialize(data: requiredData)
     }
     
-    func initialize<C: AmberController>(on controller: C, data: Reducer.State.RequiredData){
+    public func initialize<C: AmberController>(on controller: C, data: Reducer.State.RequiredData){
         routePerformer = AmberRoutePerformerImplementation(controller: controller)
         sharedInitialize(data: data)
     }
     
-    func initialize(routerPerformer: AmberRoutePerformer, data: Reducer.State.RequiredData){
+    public func initialize(routerPerformer: AmberRoutePerformer, data: Reducer.State.RequiredData){
         self.routePerformer = routerPerformer
         sharedInitialize(data: data)
     }
     
-    func currentState() -> Reducer.State{
+    public func currentState() -> Reducer.State{
         guard let state = _state.value else {
             fatalError("Не удалось получить текущее состояние. Если ошибка произошла при запуске приложения, убедитесь в том что в начальном контроллере в самом начале viewDidLoad есть строчка store.initialize(on: self)")
         }
         return state
     }
     
-    func perform(action: Reducer.Action){
+    public func perform(action: Reducer.Action){
         initiateChangeState(action: action) { (state, router, actionPerf, outActionPerf, transitionPerf) in
             self.reducer.reduce(action: action, state: state, performTransition: transitionPerf, performAction: actionPerf, performOutputAction: outActionPerf)
         }
     }
     
-    func performInput(action: Reducer.InputAction){
+    public func performInput(action: Reducer.InputAction){
         initiateChangeState(action: action) { (state, router, actionPerf, outActionPerf, _) in
             self.reducer.reduceInput(action: action, state: state, performAction: actionPerf, performOutputAction: outActionPerf)
         }
     }
     
-    func performOutput(action: Reducer.OutputAction){
+    public func performOutput(action: Reducer.OutputAction){
         Amber.main.perform(event: action, route: routePerformer) {
             self.outputListener?(action)
             Amber.main.process(state: self.currentState(), afterEvent: action, route: self.routePerformer)
         }
     }
     
-    func perform(transition: Reducer.Transition){
+    public func perform(transition: Reducer.Transition){
         Amber.main.perform(event: transition, route: routePerformer) {
             self.router(transition, self.routePerformer, self.reducer, self.perform)
             Amber.main.process(state: self.currentState(), afterEvent: transition, route: self.routePerformer)
