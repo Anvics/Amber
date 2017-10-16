@@ -118,7 +118,7 @@ final class AmberRoutePerformerImplementation<T: AmberController>: AmberRoutePer
     func popToRoot() { controller?.popToRoot(animated: true) }
     
     func embed<U: AmberController>(_ screen: U.Type, data: U.StoreState.RequiredData, view: UIView, input: U.OutputBlock?) -> U.InputBlock{
-        let (vc, output) = AmberControllerHelper.create(type: screen, data: data, input: input)
+        let (vc, output) = AmberControllerHelper.create(type: screen, data: data, routerPerformer: self, input: input)
         guard let uicontroller = controller as? UIViewController else { fatalError() }
         vc.embedIn(view: view, container: uicontroller)
         return output
