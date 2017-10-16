@@ -15,6 +15,8 @@ public protocol AmberMiddleware{
 }
 
 public class AmberLoggingMiddleware: AmberMiddleware{
+    public init(){}
+    
     public func perform(event: Any, route: AmberRoutePerformer, performBlock: @escaping () -> ()){
         performBlock()
     }
