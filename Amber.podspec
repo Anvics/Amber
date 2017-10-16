@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'Amber'
-  s.version          = '1.0.4'
+  s.version          = '1.0.5'
   s.summary          = 'flexible and convenient iOS architecture based on Flex & Elm'
 
 # This description is used to generate tags and improve search results.
@@ -17,20 +17,22 @@ Pod::Spec.new do |s|
 #   * Write the description between the DESC delimiters below.
 #   * Finally, don't worry about the indent, CocoaPods strips it!
 
-  s.description      = <<-DESC
-Amber is flexible architecture based on Elm & Flux ideas and developed specifically for iOS.
+s.description      = <<-DESC
+Amber is flexible and convenient iOS architecture based on Flex & Elm.
+It uses Reducer to process Actions and Router to process Transitions.
 DESC
 
-  s.homepage         = 'https://github.com/Anvics/Amber'
-  s.license          = { :type => 'MIT', :file => 'LICENSE' }
-  s.author           = { 'Nikita Arkhipov' => 'nikitarkhipov@gmail.com' }
-  s.source           = { :git => 'https://github.com/Anvics/Amber.git', :branch => 'master', :tag => s.version.to_s }
-  # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
+s.homepage         = 'https://github.com/Anvics/Amber'
+s.license          = { :type => 'MIT', :file => 'LICENSE' }
+s.author           = { 'Nikita Arkhipov' => 'nikitarkhipov@gmail.com' }
+s.source           = { :git => 'https://github.com/Anvics/Amber.git', :tag => s.version.to_s }
+# s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
 
-  s.ios.deployment_target = '9.0'
+s.ios.deployment_target = '9.0'
+#.swift-version = '3.2'
 
-  s.source_files = 'Amber/Classes/**/*'
-  
+s.source_files = 'Amber/Classes/**/*'
+
   # s.resource_bundles = {
   #   'Amber' => ['Amber/Assets/*.png']
   # }
