@@ -34,8 +34,10 @@ public class Amber{
     
     private(set) var middleware: [AmberMiddleware] = []
     
-    public func registerSharedMiddleware(_ sharedMiddleware: AmberMiddleware){
-        middleware.append(sharedMiddleware)
+    public func registerSharedMiddleware(_ sharedMiddleware: AmberMiddleware...){
+        for m in sharedMiddleware{
+            middleware.append(m)
+        }
     }
     
     func perform(event: Any, route: AmberRoutePerformer, index: Int = 0, completion: @escaping () -> ()){
