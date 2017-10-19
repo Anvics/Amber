@@ -27,3 +27,8 @@ public protocol AmberReducer{
     func reduceInput(action: InputAction, state: State, performAction: @escaping ActionBlock, performOutputAction: @escaping OutputActionBlock) -> State
 }
 
+public extension AmberReducer{
+    public func initialize(state: State, performAction: @escaping ActionBlock, performOutputAction: @escaping OutputActionBlock){ }
+    
+    public func reduceInput(action: InputAction, state: State, performAction: @escaping ActionBlock, performOutputAction: @escaping OutputActionBlock) -> State{ return state }
+}
