@@ -16,12 +16,12 @@ public protocol AmberMiddleware{
     func process(state: Any, afterEvent event: Any, route: AmberRoutePerformer)
 }
 
-extension AmberMiddleware{
-    func process(state: Any, beforeEvent event: Any) { }
+public extension AmberMiddleware{
+    public func process(state: Any, beforeEvent event: Any) { }
     
-    func perform(event: Any, onState state: Any, route: AmberRoutePerformer, performBlock: @escaping () -> ()){ performBlock() }
+    public func perform(event: Any, onState state: Any, route: AmberRoutePerformer, performBlock: @escaping () -> ()){ performBlock() }
     
-    func process(state: Any, afterEvent event: Any, route: AmberRoutePerformer){ }
+    public func process(state: Any, afterEvent event: Any, route: AmberRoutePerformer){ }
 }
 
 public class AmberLoggingMiddleware: AmberMiddleware{

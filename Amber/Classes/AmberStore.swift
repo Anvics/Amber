@@ -73,16 +73,14 @@ public final class AmberStore<Reducer: AmberReducer>{
     }
     
     public func performOutput(action: Reducer.OutputAction){
-        Amber.main.perform(event: action, route: routePerformer) {
+        processAction(action) {
             self.outputListener?(action)
-            Amber.main.process(state: self.currentState(), afterEvent: action, route: self.routePerformer)
         }
     }
     
     public func perform(transition: Reducer.Transition){
-        Amber.main.perform(event: transition, route: routePerformer) {
+        processAction(transition) {
             self.router(transition, self.routePerformer, self.reducer, self.perform)
-            Amber.main.process(state: self.currentState(), afterEvent: transition, route: self.routePerformer)
         }
     }
 }
@@ -93,11 +91,17 @@ extension AmberStore{
         let _ = outputAction.observeNext { [weak self] in self?.performOutput(action: $0) }
         let _ = transition.observeNext { [weak self] in self?.perform(transition: $0) }
     }
-    
-    fileprivate func initiateChangeState(action: AmberAction, newState: @escaping (Reducer.State, AmberRoutePerformer, @escaping ActionBlock, @escaping OutputActionBlock, @escaping TransitionBlock) -> Reducer.State){
-        Amber.main.perform(event: action, route: routePerformer) {
-            self.changeState(action: action, newState: newState)
+
+    fileprivate func processAction(_ action: Any, actionBlock: @escaping () -> Void){
+        Amber.main.process(state: currentState(), beforeEvent: action)
+        Amber.main.perform(event: action, onState: currentState(), route: routePerformer) {
+            actionBlock()
+            Amber.main.process(state: self.currentState(), afterEvent: action, route: self.routePerformer)
         }
+    }
+
+    fileprivate func initiateChangeState(action: AmberAction, newState: @escaping (Reducer.State, AmberRoutePerformer, @escaping ActionBlock, @escaping OutputActionBlock, @escaping TransitionBlock) -> Reducer.State){
+        processAction(action) { self.changeState(action: action, newState: newState) }
     }
     
     fileprivate func changeState(action: AmberAction, newState: (Reducer.State, AmberRoutePerformer, @escaping ActionBlock, @escaping OutputActionBlock, @escaping TransitionBlock) -> Reducer.State){
@@ -118,7 +122,6 @@ extension AmberStore{
             else{ delayedTransitions.append(t) }
         })
         
-        Amber.main.process(state: ns, afterEvent: action, route: routePerformer)
         _state.value = ns
         
         isPerformed = true

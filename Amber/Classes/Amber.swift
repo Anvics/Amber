@@ -40,10 +40,14 @@ public class Amber{
         }
     }
     
-    func perform(event: Any, route: AmberRoutePerformer, index: Int = 0, completion: @escaping () -> ()){
+    func process(state: Any, beforeEvent event: Any){
+        middleware.forEach { $0.process(state: state, beforeEvent: event) }
+    }
+    
+    func perform(event: Any, onState state: Any, route: AmberRoutePerformer, index: Int = 0, completion: @escaping () -> ()){
         if index == middleware.count { completion(); return }
-        middleware[index].perform(event: event, route: route) {
-            self.perform(event: event, route: route, index: index + 1, completion: completion)
+        middleware[index].perform(event: event, onState: state, route: route) {
+            self.perform(event: event, onState: state, route: route, index: index + 1, completion: completion)
         }
     }
     
