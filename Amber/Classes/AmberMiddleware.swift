@@ -9,17 +9,23 @@
 import Foundation
 
 public protocol AmberMiddleware{
-    func perform(event: Any, route: AmberRoutePerformer, performBlock: @escaping () -> ())
+    func process(state: Any, beforeEvent event: Any)
+    
+    func perform(event: Any, onState state: Any, route: AmberRoutePerformer, performBlock: @escaping () -> ())
     
     func process(state: Any, afterEvent event: Any, route: AmberRoutePerformer)
 }
 
+extension AmberMiddleware{
+    func process(state: Any, beforeEvent event: Any) { }
+    
+    func perform(event: Any, onState state: Any, route: AmberRoutePerformer, performBlock: @escaping () -> ()){ performBlock() }
+    
+    func process(state: Any, afterEvent event: Any, route: AmberRoutePerformer){ }
+}
+
 public class AmberLoggingMiddleware: AmberMiddleware{
     public init(){}
-    
-    public func perform(event: Any, route: AmberRoutePerformer, performBlock: @escaping () -> ()){
-        performBlock()
-    }
     
     public func process(state: Any, afterEvent event: Any, route: AmberRoutePerformer){
         print("----------------------------------------")
