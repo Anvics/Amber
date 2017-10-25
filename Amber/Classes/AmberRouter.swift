@@ -13,26 +13,26 @@ enum AmberPresentationType{
 }
 
 public protocol AmberEmbedder {
-    func embed<U: AmberController>(_ screen: U.Type, data: U.StoreState.RequiredData, view: UIView, input: U.OutputBlock?) -> U.InputBlock
+    func embed<Module: AmberController>(_ module: Module.Type, data: Module.State.RequiredData, inView view: UIView, outputListener: Module.OutputActionListener?) -> Module.InputActionListener
 }
 
 public extension AmberEmbedder{
-    func embed<U: AmberController>(_ screen: U.Type, data: U.StoreState.RequiredData, view: UIView) -> U.InputBlock{
-        return embed(screen, data: data, view: view, input: nil)
+    func embed<Module: AmberController>(_ module: Module.Type, data: Module.State.RequiredData, inView view: UIView) -> Module.InputActionListener{
+        return embed(module, data: data, inView: view, outputListener: nil)
     }
     
-    func embed<U: AmberController>(_ screen: U.Type, view: UIView, input: U.OutputBlock? = nil) -> U.InputBlock where U.StoreState.RequiredData == Void{
-        return embed(screen, data: (), view: view, input: input)
+    func embed<Module: AmberController>(_ module: Module.Type, inView view: UIView, outputListener: Module.OutputActionListener? = nil) -> Module.InputActionListener where Module.State.RequiredData == Void{
+        return embed(module, data: (), inView: view, outputListener: outputListener)
     }
 }
 
 public protocol AmberRoutePerformer: AmberEmbedder {
-    func replace<U: AmberController>(_ screen: U.Type, data: U.StoreState.RequiredData, animation: UIViewAnimationOptions)
+    func replace<Module: AmberController>(with module: Module.Type, data: Module.State.RequiredData, animation: UIViewAnimationOptions)
     
-    func show<U: AmberController>(_ screen: U.Type, data: U.StoreState.RequiredData, input: U.OutputBlock?) -> U.InputBlock
+    func show<Module: AmberController>(_ module: Module.Type, data: Module.State.RequiredData, outputListener: Module.OutputActionListener?) -> Module.InputActionListener
     
-    func push<U: AmberController>(_ screen: U.Type, data: U.StoreState.RequiredData, input: U.OutputBlock?) -> U.InputBlock
-    func present<U: AmberController>(_ screen: U.Type, data: U.StoreState.RequiredData, input: U.OutputBlock?) -> U.InputBlock
+    func push<Module: AmberController>(_ module: Module.Type, data: Module.State.RequiredData, outputListener: Module.OutputActionListener?) -> Module.InputActionListener
+    func present<Module: AmberController>(_ module: Module.Type, data: Module.State.RequiredData, outputListener: Module.OutputActionListener?) -> Module.InputActionListener
     
     func close()
     
@@ -42,38 +42,38 @@ public protocol AmberRoutePerformer: AmberEmbedder {
 }
 
 public extension AmberRoutePerformer{
-    func replace<U: AmberController>(_ screen: U.Type, animation: UIViewAnimationOptions = .transitionCrossDissolve) where U.StoreState.RequiredData == Void{
-        replace(screen, data: (), animation: animation)
+    func replace<Module: AmberController>(with module: Module.Type, animation: UIViewAnimationOptions = .transitionCrossDissolve) where Module.State.RequiredData == Void{
+        replace(with: module, data: (), animation: animation)
     }
     
-    func replace<U: AmberController>(_ screen: U.Type, data: U.StoreState.RequiredData){
-        replace(screen, data: data, animation: .transitionCrossDissolve)
+    func replace<Module: AmberController>(with module: Module.Type, data: Module.State.RequiredData){
+        replace(with: module, data: data, animation: .transitionCrossDissolve)
     }
     
-    func show<U: AmberController>(_ screen: U.Type, input: U.OutputBlock? = nil) -> U.InputBlock where U.StoreState.RequiredData == Void{
-        return show(screen, data: (), input: input)
+    func show<Module: AmberController>(_ module: Module.Type, outputListener: Module.OutputActionListener? = nil) -> Module.InputActionListener where Module.State.RequiredData == Void{
+        return show(module, data: (), outputListener: outputListener)
     }
     
-    func show<U: AmberController>(_ screen: U.Type, data: U.StoreState.RequiredData) -> U.InputBlock{
-        return show(screen, data: data, input: nil)
+    func show<Module: AmberController>(_ module: Module.Type, data: Module.State.RequiredData) -> Module.InputActionListener{
+        return show(module, data: data, outputListener: nil)
     }
     
-    func push<U: AmberController>(_ screen: U.Type, input: U.OutputBlock? = nil) -> U.InputBlock where U.StoreState.RequiredData == Void{
-        return push(screen, data: (), input: input)
+    func push<Module: AmberController>(_ module: Module.Type, outputListener: Module.OutputActionListener? = nil) -> Module.InputActionListener where Module.State.RequiredData == Void{
+        return push(module, data: (), outputListener: outputListener)
     }
     
-    func present<U: AmberController>(_ screen: U.Type, input: U.OutputBlock? = nil) -> U.InputBlock where U.StoreState.RequiredData == Void{
-        return present(screen, data: (), input: input)
+    func present<Module: AmberController>(_ module: Module.Type, outputListener: Module.OutputActionListener? = nil) -> Module.InputActionListener where Module.State.RequiredData == Void{
+        return present(module, data: (), outputListener: outputListener)
     }
 }
 
 public class FakeAmberRoutePerformer: AmberRoutePerformer{
-    public func embed<U: AmberController>(_ screen: U.Type, data: U.StoreState.RequiredData, view: UIView, input: U.OutputBlock?) -> U.InputBlock{ return { _ in } }
-    public func replace<U: AmberController>(_ screen: U.Type, data: U.StoreState.RequiredData, animation: UIViewAnimationOptions){ }
+    public func embed<Module: AmberController>(_ module: Module.Type, data: Module.State.RequiredData, inView view: UIView, outputListener: Module.OutputActionListener?) -> Module.InputActionListener{ return { _ in } }
+    public func replace<Module: AmberController>(with module: Module.Type, data: Module.State.RequiredData, animation: UIViewAnimationOptions){ }
     
-    public func show<U: AmberController>(_ screen: U.Type, data: U.StoreState.RequiredData, input: U.OutputBlock?) -> U.InputBlock{ return { _ in } }
-    public func push<U: AmberController>(_ screen: U.Type, data: U.StoreState.RequiredData, input: U.OutputBlock?) -> U.InputBlock{ return { _ in } }
-    public func present<U: AmberController>(_ screen: U.Type, data: U.StoreState.RequiredData, input: U.OutputBlock?) -> U.InputBlock{ return { _ in } }
+    public func show<Module: AmberController>(_ module: Module.Type, data: Module.State.RequiredData, outputListener: Module.OutputActionListener?) -> Module.InputActionListener{ return { _ in } }
+    public func push<Module: AmberController>(_ module: Module.Type, data: Module.State.RequiredData, outputListener: Module.OutputActionListener?) -> Module.InputActionListener{ return { _ in } }
+    public func present<Module: AmberController>(_ module: Module.Type, data: Module.State.RequiredData, outputListener: Module.OutputActionListener?) -> Module.InputActionListener{ return { _ in } }
     
     public func close(){ }
     
@@ -89,24 +89,24 @@ final class AmberRoutePerformerImplementation<T: AmberController>: AmberRoutePer
         self.controller = controller
     }
     
-    func replace<U: AmberController>(_ screen: U.Type, data: U.StoreState.RequiredData, animation: UIViewAnimationOptions){
+    func replace<Module: AmberController>(with module: Module.Type, data: Module.State.RequiredData, animation: UIViewAnimationOptions){
         guard let currentVC = UIApplication.shared.keyWindow?.rootViewController else { fatalError() }
-        let (vc, _) = AmberControllerHelper.create(type: screen, data: data, input: nil)
+        let (vc, _) = AmberControllerHelper.create(module: module, data: data, outputListener: nil)
         UIView.transition(from: currentVC.view, to: vc.view, duration: 0.4, options: animation) { _ in
             UIApplication.shared.keyWindow?.rootViewController = vc
         }
     }
     
-    func show<U: AmberController>(_ screen: U.Type, data: U.StoreState.RequiredData, input: U.OutputBlock?) -> U.InputBlock{
-        return route(type: screen, data: data, presentation: .show, input: input)
+    func show<Module: AmberController>(_ module: Module.Type, data: Module.State.RequiredData, outputListener: Module.OutputActionListener?) -> Module.InputActionListener{
+        return route(module: module, data: data, presentation: .show, outputListener: outputListener)
     }
     
-    func push<U: AmberController>(_ screen: U.Type, data: U.StoreState.RequiredData, input: U.OutputBlock?) -> U.InputBlock{
-        return route(type: screen, data: data, presentation: .push, input: input)
+    func push<Module: AmberController>(_ module: Module.Type, data: Module.State.RequiredData, outputListener: Module.OutputActionListener?) -> Module.InputActionListener{
+        return route(module: module, data: data, presentation: .push, outputListener: outputListener)
     }
     
-    func present<U: AmberController>(_ screen: U.Type, data: U.StoreState.RequiredData, input: U.OutputBlock?) -> U.InputBlock{
-        return route(type: screen, data: data, presentation: .present, input: input)
+    func present<Module: AmberController>(_ module: Module.Type, data: Module.State.RequiredData, outputListener: Module.OutputActionListener?) -> Module.InputActionListener{
+        return route(module: module, data: data, presentation: .present, outputListener: outputListener)
     }
     
     func close() { controller?.close(animated: true) }
@@ -117,15 +117,15 @@ final class AmberRoutePerformerImplementation<T: AmberController>: AmberRoutePer
     
     func popToRoot() { controller?.popToRoot(animated: true) }
     
-    func embed<U: AmberController>(_ screen: U.Type, data: U.StoreState.RequiredData, view: UIView, input: U.OutputBlock?) -> U.InputBlock{
-        let (vc, output) = AmberControllerHelper.create(type: screen, data: data, routerPerformer: self, input: input)
+    func embed<Module: AmberController>(_ module: Module.Type, data: Module.State.RequiredData, inView view: UIView, outputListener: Module.OutputActionListener?) -> Module.InputActionListener{
+        let (vc, output) = AmberControllerHelper.create(module: module, data: data, routerPerformer: self, outputListener: outputListener)
         guard let uicontroller = controller as? UIViewController else { fatalError() }
         vc.embedIn(view: view, container: uicontroller)
         return output
     }
     
-    fileprivate func route<U: AmberController>(type: U.Type, data: U.StoreState.RequiredData, presentation: AmberPresentationType, input: U.OutputBlock?) -> U.InputBlock{
-        let (vc, output) = AmberControllerHelper.create(type: type, data: data, input: input)
+    fileprivate func route<Module: AmberController>(module: Module.Type, data: Module.State.RequiredData, presentation: AmberPresentationType, outputListener: Module.OutputActionListener?) -> Module.InputActionListener{
+        let (vc, output) = AmberControllerHelper.create(module: module, data: data, outputListener: outputListener)
         
         switch presentation {
         case .present: controller?.present(vc, animated: true, completion: nil)

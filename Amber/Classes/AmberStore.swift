@@ -12,9 +12,9 @@ import ReactiveKit
 public final class AmberStore<Reducer: AmberReducer>{
     var state: Signal<Reducer.State, NoError> { return _state.toSignal().ignoreNil() }
     
-    let action = Subject<Reducer.Action, NoError>()
-    let outputAction = Subject<Reducer.OutputAction, NoError>()
-    let transition = Subject<Reducer.Transition, NoError>()
+    public let action = Subject<Reducer.Action, NoError>()
+    public let outputAction = Subject<Reducer.OutputAction, NoError>()
+    public let transition = Subject<Reducer.Transition, NoError>()
     
     fileprivate var outputListener: ((Reducer.OutputAction) -> Void)?
     fileprivate var routePerformer: AmberRoutePerformer!
@@ -139,11 +139,11 @@ extension AmberStore{
 }
 
 public class AmberControllerHelper{
-    public static func create<U: AmberController>(type: U.Type, data: U.StoreState.RequiredData, routerPerformer: AmberRoutePerformer? = nil, input: U.OutputBlock? = nil) -> (UIViewController, U.InputBlock){
-        let vc = U.instantiate()
+    public static func create<Module: AmberController>(module: Module.Type, data: Module.State.RequiredData, routerPerformer: AmberRoutePerformer? = nil, outputListener: Module.OutputActionListener? = nil) -> (UIViewController, Module.InputActionListener){
+        let vc = Module.instantiate()
         if let rp = routerPerformer { vc.store.initialize(routerPerformer: rp, data: data) }
         else { vc.initialize(with: data) }
-        vc.store.outputListener = input
+        vc.store.outputListener = outputListener
         
         guard let uivc = vc as? UIViewController else {
             fatalError("На текущий момент возможно произвести переход/встроить только UIViewController. Попытались создать \(type(of: vc))")

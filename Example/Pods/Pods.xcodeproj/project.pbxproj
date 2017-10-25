@@ -20,7 +20,7 @@
 		193A6F9C7EDA301A8EE5D80C290069C8 /* UIBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = C893F8D0205CEF6DE88D184EFEF50105 /* UIBarItem.swift */; };
 		1EDFF7981F94DE9F00D17771 /* Amber.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EDFF7911F94DE9F00D17771 /* Amber.swift */; };
 		1EDFF7991F94DE9F00D17771 /* AmberController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EDFF7921F94DE9F00D17771 /* AmberController.swift */; };
-		1EDFF79A1F94DE9F00D17771 /* AmberControllerHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EDFF7931F94DE9F00D17771 /* AmberControllerHelper.swift */; };
+		1EDFF79A1F94DE9F00D17771 /* AmberController+UI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EDFF7931F94DE9F00D17771 /* AmberController+UI.swift */; };
 		1EDFF79B1F94DE9F00D17771 /* AmberMiddleware.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EDFF7941F94DE9F00D17771 /* AmberMiddleware.swift */; };
 		1EDFF79C1F94DE9F00D17771 /* AmberReducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EDFF7951F94DE9F00D17771 /* AmberReducer.swift */; };
 		1EDFF79D1F94DE9F00D17771 /* AmberRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EDFF7961F94DE9F00D17771 /* AmberRouter.swift */; };
@@ -151,7 +151,7 @@
 		1CDEE94D97E76AAC9899B65D3CDF7AF6 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		1EDFF7911F94DE9F00D17771 /* Amber.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Amber.swift; path = Amber/Classes/Amber.swift; sourceTree = "<group>"; };
 		1EDFF7921F94DE9F00D17771 /* AmberController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AmberController.swift; path = Amber/Classes/AmberController.swift; sourceTree = "<group>"; };
-		1EDFF7931F94DE9F00D17771 /* AmberControllerHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AmberControllerHelper.swift; path = Amber/Classes/AmberControllerHelper.swift; sourceTree = "<group>"; };
+		1EDFF7931F94DE9F00D17771 /* AmberController+UI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "AmberController+UI.swift"; path = "Amber/Classes/AmberController+UI.swift"; sourceTree = "<group>"; };
 		1EDFF7941F94DE9F00D17771 /* AmberMiddleware.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AmberMiddleware.swift; path = Amber/Classes/AmberMiddleware.swift; sourceTree = "<group>"; };
 		1EDFF7951F94DE9F00D17771 /* AmberReducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AmberReducer.swift; path = Amber/Classes/AmberReducer.swift; sourceTree = "<group>"; };
 		1EDFF7961F94DE9F00D17771 /* AmberRouter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AmberRouter.swift; path = Amber/Classes/AmberRouter.swift; sourceTree = "<group>"; };
@@ -452,7 +452,7 @@
 			children = (
 				1EDFF7911F94DE9F00D17771 /* Amber.swift */,
 				1EDFF7921F94DE9F00D17771 /* AmberController.swift */,
-				1EDFF7931F94DE9F00D17771 /* AmberControllerHelper.swift */,
+				1EDFF7931F94DE9F00D17771 /* AmberController+UI.swift */,
 				1EDFF7941F94DE9F00D17771 /* AmberMiddleware.swift */,
 				1EDFF7951F94DE9F00D17771 /* AmberReducer.swift */,
 				1EDFF7961F94DE9F00D17771 /* AmberRouter.swift */,
@@ -723,7 +723,7 @@
 				1EDFF79C1F94DE9F00D17771 /* AmberReducer.swift in Sources */,
 				5F19804202CD58B03F92AF6E83664463 /* Pods-Amber_Tests-dummy.m in Sources */,
 				1EDFF79B1F94DE9F00D17771 /* AmberMiddleware.swift in Sources */,
-				1EDFF79A1F94DE9F00D17771 /* AmberControllerHelper.swift in Sources */,
+				1EDFF79A1F94DE9F00D17771 /* AmberController+UI.swift in Sources */,
 				1EDFF7991F94DE9F00D17771 /* AmberController.swift in Sources */,
 				1EDFF7981F94DE9F00D17771 /* Amber.swift in Sources */,
 				1EDFF79E1F94DE9F00D17771 /* AmberStore.swift in Sources */,

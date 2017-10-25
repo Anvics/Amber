@@ -36,9 +36,9 @@ public protocol AmberController: class, AmberPresenter, AmberPresentable {
 }
 
 public extension AmberController{
-    typealias StoreState = Reducer.State
-    typealias InputBlock = (Reducer.InputAction) -> Void
-    typealias OutputBlock = (Reducer.OutputAction) -> Void
+    typealias State = Reducer.State
+    typealias InputActionListener = (Reducer.InputAction) -> Void
+    typealias OutputActionListener = (Reducer.OutputAction) -> Void
     
     public func initialize(with data: Reducer.State.RequiredData){
         store.initialize(on: self, data: data)

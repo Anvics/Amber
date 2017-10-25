@@ -16,19 +16,19 @@ public protocol AmberReducer{
     associatedtype Transition: AmberTransition
 
     typealias ActionBlock = (Action) -> Void
-    typealias InputActionBlock = (InputAction) -> Void
-    typealias OutputActionBlock = (OutputAction) -> Void
+    typealias InputActionListener = (InputAction) -> Void
+    typealias OutputActionListener = (OutputAction) -> Void
     typealias TransitionBlock = (Transition) -> Void
     
-    func initialize(state: State, performAction: @escaping ActionBlock, performOutputAction: @escaping OutputActionBlock)
+    func initialize(state: State, performAction: @escaping ActionBlock, performOutputAction: @escaping OutputActionListener)
     
-    func reduce(action: Action, state: State, performTransition: @escaping TransitionBlock, performAction: @escaping ActionBlock, performOutputAction: @escaping OutputActionBlock) -> State
+    func reduce(action: Action, state: State, performTransition: @escaping TransitionBlock, performAction: @escaping ActionBlock, performOutputAction: @escaping OutputActionListener) -> State
     
-    func reduceInput(action: InputAction, state: State, performAction: @escaping ActionBlock, performOutputAction: @escaping OutputActionBlock) -> State
+    func reduceInput(action: InputAction, state: State, performAction: @escaping ActionBlock, performOutputAction: @escaping OutputActionListener) -> State
 }
 
 public extension AmberReducer{
-    public func initialize(state: State, performAction: @escaping ActionBlock, performOutputAction: @escaping OutputActionBlock){ }
+    public func initialize(state: State, performAction: @escaping ActionBlock, performOutputAction: @escaping OutputActionListener){ }
     
-    public func reduceInput(action: InputAction, state: State, performAction: @escaping ActionBlock, performOutputAction: @escaping OutputActionBlock) -> State{ return state }
+    public func reduceInput(action: InputAction, state: State, performAction: @escaping ActionBlock, performOutputAction: @escaping OutputActionListener) -> State{ return state }
 }

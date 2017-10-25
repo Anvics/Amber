@@ -55,14 +55,14 @@ public class Amber{
         middleware.forEach { $0.process(state: state, afterEvent: event, route: route) }
     }
     
-    public static func setInitial<U: AmberController>(screen: U.Type, data: U.StoreState.RequiredData, window: UIWindow!){
-        let (vc, _) = AmberControllerHelper.create(type: screen, data: data, input: nil)
+    public static func setInitial<Module: AmberController>(module: Module.Type, data: Module.State.RequiredData, window: UIWindow!){
+        let (vc, _) = AmberControllerHelper.create(module: module, data: data, outputListener: nil)
         window.rootViewController = vc
         window.makeKeyAndVisible()
     }
     
-    public static func setInitial<U: AmberController>(screen: U.Type, window: UIWindow!) where U.StoreState.RequiredData == Void{
-        setInitial(screen: screen, data: (), window: window)
+    public static func setInitial<Module: AmberController>(module: Module.Type, window: UIWindow!) where Module.State.RequiredData == Void{
+        setInitial(module: module, data: (), window: window)
     }
 }
 
