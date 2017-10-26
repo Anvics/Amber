@@ -13,7 +13,6 @@ public protocol AmberPresenter: class {
     func embedIn(view: UIView, container: UIViewController)
     
     func present(_ viewControllerToPresent: UIViewController, animated flag: Bool, completion: (() -> Swift.Void)?)
-    func push(_ viewController: UIViewController, animated: Bool)
     
     func show(_ viewController: UIViewController, animated: Bool)
     
@@ -41,7 +40,7 @@ public extension AmberController{
     typealias OutputActionListener = (Reducer.OutputAction) -> Void
     
     public func initialize(with data: Reducer.State.RequiredData){
-        store.initialize(on: self, data: data)
+        store.initialize(with: data, routePerformer: AmberRoutePerformerImplementation(controller: self, embedder: self))
     }
     
     public var action: Subject<Reducer.Action, NoError> { return store.action }
@@ -49,4 +48,10 @@ public extension AmberController{
     public var transition: Subject<Reducer.Transition, NoError> { return store.transition }
     
     public var state: Signal<Reducer.State, NoError> { return store.state }
+}
+
+public extension AmberController where Reducer.State.RequiredData == Void{
+    public func initialize(){
+        store.initialize(with: (), routePerformer: AmberRoutePerformerImplementation(controller: self, embedder: self))
+    }
 }

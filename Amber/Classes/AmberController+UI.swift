@@ -20,7 +20,7 @@ extension UIViewController: AmberPresenter{
     public func push(_ viewController: UIViewController, animated: Bool){
         navigationController?.pushViewController(viewController, animated: animated)
     }
-    
+
     public func embedIn(view: UIView, container: UIViewController){
         self.view.frame = view.bounds
         container.addChildViewController(self)

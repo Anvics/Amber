@@ -23,6 +23,7 @@ public final class AmberStore<Reducer: AmberReducer>{
     
     fileprivate let reducer: Reducer
     private let router: AmberRouterBlock<Reducer>
+    private var isInitialized = false
     
     typealias ActionBlock = (Reducer.Action) -> Void
     typealias OutputActionBlock = (Reducer.OutputAction) -> Void
@@ -43,13 +44,10 @@ public final class AmberStore<Reducer: AmberReducer>{
         sharedInitialize(data: requiredData)
     }
     
-    public func initialize<C: AmberController>(on controller: C, data: Reducer.State.RequiredData){
-        routePerformer = AmberRoutePerformerImplementation(controller: controller)
-        sharedInitialize(data: data)
-    }
-    
-    public func initialize(routerPerformer: AmberRoutePerformer, data: Reducer.State.RequiredData){
-        self.routePerformer = routerPerformer
+    public func initialize(with data: Reducer.State.RequiredData, routePerformer: AmberRoutePerformer){
+        if isInitialized { return }
+        isInitialized = true
+        self.routePerformer = routePerformer
         sharedInitialize(data: data)
     }
     
@@ -134,15 +132,22 @@ extension AmberStore{
         _state.value = Reducer.State(data: data)
         
         reducer.initialize(state: currentState(), performAction: perform, performOutputAction: performOutput)
-        Amber.main.process(state: currentState(), afterEvent: "Initialize \(Reducer.self)", route: routePerformer)
     }
 }
 
 public class AmberControllerHelper{
-    public static func create<Module: AmberController>(module: Module.Type, data: Module.State.RequiredData, routerPerformer: AmberRoutePerformer? = nil, outputListener: Module.OutputActionListener? = nil) -> (UIViewController, Module.InputActionListener){
+    public static func create<Module: AmberController>(module: Module.Type, data: Module.State.RequiredData, outputListener: Module.OutputActionListener? = nil) -> (UIViewController, Module.InputActionListener){
+        return create(module: module, data: data, outputListener: outputListener, router: { $0 })
+    }
+    
+    public static func create<Module: AmberController, Route: AmberController>(module: Module.Type, data: Module.State.RequiredData, route: Route, outputListener: Module.OutputActionListener? = nil) -> (UIViewController, Module.InputActionListener){
+        return create(module: module, data: data, outputListener: outputListener, router: { _ in route })
+    }
+    
+    private static func create<Module: AmberController, Route: AmberController>(module: Module.Type, data: Module.State.RequiredData, outputListener: Module.OutputActionListener? = nil, router: (Module) -> Route) -> (UIViewController, Module.InputActionListener){
+        
         let vc = Module.instantiate()
-        if let rp = routerPerformer { vc.store.initialize(routerPerformer: rp, data: data) }
-        else { vc.initialize(with: data) }
+        vc.store.initialize(with: data, routePerformer: AmberRoutePerformerImplementation(controller: router(vc), embedder: vc))
         vc.store.outputListener = outputListener
         
         guard let uivc = vc as? UIViewController else {

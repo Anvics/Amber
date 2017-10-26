@@ -9,7 +9,7 @@
 import UIKit
 
 enum AmberPresentationType{
-    case push, present, show, embed
+    case present, show, embed
 }
 
 public protocol AmberEmbedder {
@@ -28,12 +28,15 @@ public extension AmberEmbedder{
 
 public protocol AmberRoutePerformer: AmberEmbedder {
     func replace<Module: AmberController>(with module: Module.Type, data: Module.State.RequiredData, animation: UIViewAnimationOptions)
-    
     func show<Module: AmberController>(_ module: Module.Type, data: Module.State.RequiredData, outputListener: Module.OutputActionListener?) -> Module.InputActionListener
-    
-    func push<Module: AmberController>(_ module: Module.Type, data: Module.State.RequiredData, outputListener: Module.OutputActionListener?) -> Module.InputActionListener
     func present<Module: AmberController>(_ module: Module.Type, data: Module.State.RequiredData, outputListener: Module.OutputActionListener?) -> Module.InputActionListener
     
+    func baseReplace(storyboardFile: String, storyboardID: String, animation: UIViewAnimationOptions)
+
+    func baseShow(storyboardFile: String, storyboardID: String)
+
+    func basePresent(storyboardFile: String, storyboardID: String)
+
     func close()
     
     func dismiss()
@@ -50,16 +53,16 @@ public extension AmberRoutePerformer{
         replace(with: module, data: data, animation: .transitionCrossDissolve)
     }
     
+    func baseReplace(storyboardFile: String, storyboardID: String){
+        baseReplace(storyboardFile: storyboardFile, storyboardID: storyboardID, animation: .transitionCrossDissolve)
+    }
+    
     func show<Module: AmberController>(_ module: Module.Type, outputListener: Module.OutputActionListener? = nil) -> Module.InputActionListener where Module.State.RequiredData == Void{
         return show(module, data: (), outputListener: outputListener)
     }
     
     func show<Module: AmberController>(_ module: Module.Type, data: Module.State.RequiredData) -> Module.InputActionListener{
         return show(module, data: data, outputListener: nil)
-    }
-    
-    func push<Module: AmberController>(_ module: Module.Type, outputListener: Module.OutputActionListener? = nil) -> Module.InputActionListener where Module.State.RequiredData == Void{
-        return push(module, data: (), outputListener: outputListener)
     }
     
     func present<Module: AmberController>(_ module: Module.Type, outputListener: Module.OutputActionListener? = nil) -> Module.InputActionListener where Module.State.RequiredData == Void{
@@ -72,8 +75,13 @@ public class FakeAmberRoutePerformer: AmberRoutePerformer{
     public func replace<Module: AmberController>(with module: Module.Type, data: Module.State.RequiredData, animation: UIViewAnimationOptions){ }
     
     public func show<Module: AmberController>(_ module: Module.Type, data: Module.State.RequiredData, outputListener: Module.OutputActionListener?) -> Module.InputActionListener{ return { _ in } }
-    public func push<Module: AmberController>(_ module: Module.Type, data: Module.State.RequiredData, outputListener: Module.OutputActionListener?) -> Module.InputActionListener{ return { _ in } }
     public func present<Module: AmberController>(_ module: Module.Type, data: Module.State.RequiredData, outputListener: Module.OutputActionListener?) -> Module.InputActionListener{ return { _ in } }
+    
+    public func baseReplace(storyboardFile: String, storyboardID: String, animation: UIViewAnimationOptions){ }
+    
+    public func baseShow(storyboardFile: String, storyboardID: String){ }
+    
+    public func basePresent(storyboardFile: String, storyboardID: String){ }
     
     public func close(){ }
     
@@ -82,31 +90,41 @@ public class FakeAmberRoutePerformer: AmberRoutePerformer{
     public func popToRoot(){ }
 }
 
-final class AmberRoutePerformerImplementation<T: AmberController>: AmberRoutePerformer {
+final class AmberRoutePerformerImplementation<T: AmberController, U: AmberController>: AmberRoutePerformer {
     weak var controller: T?
+    weak var embedder: U?
     
-    init(controller: T) {
+    init(controller: T, embedder: U) {
         self.controller = controller
+        self.embedder = embedder
     }
     
     func replace<Module: AmberController>(with module: Module.Type, data: Module.State.RequiredData, animation: UIViewAnimationOptions){
-        guard let currentVC = UIApplication.shared.keyWindow?.rootViewController else { fatalError() }
         let (vc, _) = AmberControllerHelper.create(module: module, data: data, outputListener: nil)
-        UIView.transition(from: currentVC.view, to: vc.view, duration: 0.4, options: animation) { _ in
-            UIApplication.shared.keyWindow?.rootViewController = vc
-        }
+        replaceWith(vc, animation: animation)
     }
     
     func show<Module: AmberController>(_ module: Module.Type, data: Module.State.RequiredData, outputListener: Module.OutputActionListener?) -> Module.InputActionListener{
         return route(module: module, data: data, presentation: .show, outputListener: outputListener)
     }
     
-    func push<Module: AmberController>(_ module: Module.Type, data: Module.State.RequiredData, outputListener: Module.OutputActionListener?) -> Module.InputActionListener{
-        return route(module: module, data: data, presentation: .push, outputListener: outputListener)
-    }
-    
     func present<Module: AmberController>(_ module: Module.Type, data: Module.State.RequiredData, outputListener: Module.OutputActionListener?) -> Module.InputActionListener{
         return route(module: module, data: data, presentation: .present, outputListener: outputListener)
+    }
+    
+    func baseReplace(storyboardFile: String, storyboardID: String, animation: UIViewAnimationOptions){
+        let vc = createController(storyboardFile: storyboardFile, storyboardID: storyboardID)
+        replaceWith(vc, animation: animation)
+    }
+    
+    func baseShow(storyboardFile: String, storyboardID: String){
+        let vc = createController(storyboardFile: storyboardFile, storyboardID: storyboardID)
+        controller?.show(vc, animated: true)
+    }
+    
+    func basePresent(storyboardFile: String, storyboardID: String){
+        let vc = createController(storyboardFile: storyboardFile, storyboardID: storyboardID)
+        controller?.present(vc, animated: true, completion: nil)
     }
     
     func close() { controller?.close(animated: true) }
@@ -118,10 +136,21 @@ final class AmberRoutePerformerImplementation<T: AmberController>: AmberRoutePer
     func popToRoot() { controller?.popToRoot(animated: true) }
     
     func embed<Module: AmberController>(_ module: Module.Type, data: Module.State.RequiredData, inView view: UIView, outputListener: Module.OutputActionListener?) -> Module.InputActionListener{
-        let (vc, output) = AmberControllerHelper.create(module: module, data: data, routerPerformer: self, outputListener: outputListener)
+        let (vc, output) = AmberControllerHelper.create(module: module, data: data, route: controller!, outputListener: outputListener)
         guard let uicontroller = controller as? UIViewController else { fatalError() }
         vc.embedIn(view: view, container: uicontroller)
         return output
+    }
+    
+    private func replaceWith(_ vc: UIViewController, animation: UIViewAnimationOptions){
+        guard let currentVC = UIApplication.shared.keyWindow?.rootViewController else { fatalError() }
+        UIView.transition(from: currentVC.view, to: vc.view, duration: 0.4, options: animation) { _ in
+            UIApplication.shared.keyWindow?.rootViewController = vc
+        }
+    }
+    
+    private func createController(storyboardFile: String, storyboardID: String) -> UIViewController{
+        return UIStoryboard(name: storyboardFile, bundle: nil).instantiateViewController(withIdentifier: storyboardID)
     }
     
     fileprivate func route<Module: AmberController>(module: Module.Type, data: Module.State.RequiredData, presentation: AmberPresentationType, outputListener: Module.OutputActionListener?) -> Module.InputActionListener{
@@ -129,7 +158,6 @@ final class AmberRoutePerformerImplementation<T: AmberController>: AmberRoutePer
         
         switch presentation {
         case .present: controller?.present(vc, animated: true, completion: nil)
-        case .push: controller?.push(vc, animated: true)
         case .show: controller?.show(vc, animated: true)
         case .embed: fatalError("Call embed instead of route")
         }
