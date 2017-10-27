@@ -29,7 +29,7 @@ Here is [amber module](https://github.com/Anvics/AmberModule) for
 [Generamba](https://github.com/rambler-digital-solutions/Generamba)
 
 ## Example
-You can check out simple example of Amber usaga: [TestProject](https://github.com/Anvics/AmberExample)
+You can check out simple example of Amber usage: [TestProject](https://github.com/Anvics/AmberExample)
 
 ## Installation
 
