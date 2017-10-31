@@ -11,7 +11,7 @@ Bond is built on top of ReactiveKit and bridges the gap between the reactive and
 
 ### Note: Xcode 9 support
 
-Version 6.3.0 introduces Xcode 9 support. One of the required changes to support Xcode 9, i.e. Swift 3.2 or 4, was to drop `Collection` conformance from `ObservableArray`, `Observable2DArray`, `ObservableSet` and `ObservableDictionary` types. This is unfortunate, but not problematic as the types expose underlaying collection.
+Version 6.3 introduces Xcode 9 support. One of the required changes to support Xcode 9, i.e. Swift 3.2 or 4, was to drop `Collection` conformance from `ObservableArray`, `Observable2DArray`, `ObservableSet` and `ObservableDictionary` types. This is unfortunate, but not problematic as the types expose underlaying collection.
 
 For example, if you were doing
 
@@ -26,6 +26,8 @@ for element in observableArray.array { .. }
 ```
 
 Respective underlaying collections for other types are `Observable2DArray.sections`, `ObservableSet.set` and `ObservableDictionary.dictionary`.
+
+Note: Since version 6.4, ReactiveKit is using Swift 4 syntax that compiles under Xcode 9. If you are still using Xcode 8, please do not update to v6.4 and stay on the latest v6.3.x version!
 
 
 ## What can it do?
@@ -287,7 +289,7 @@ You can then convert methods of that protocol into signals:
 ```swift
 extension UITableView {
   var selectedRow: Signal<Int, NoError> {
-    return reactive.delegate.signal(for: #selector(UITableViewDelegate.tableView(_:didSelectRowAtIndexPath:))) { (subject: PublishSubject<Int, NoError>, _: UITableView, indexPath: NSIndexPath) in
+    return reactive.delegate.signal(for: #selector(UITableViewDelegate.tableView(_:didSelectRowAtIndexPath:))) { (subject: SafePublishSubject<Int>, _: UITableView, indexPath: IndexPath) in
       subject.next(indexPath.row)
     }
   }
@@ -322,8 +324,7 @@ Method `feed` takes three parameters: a property to feed from, a selector, and a
 
 You should not set more that one feed property per selector.
 
-Note that in the mapping closures of both `signal(for:)` and `feed` methods you must be explicit about argument and return types. Also, **you must use ObjC types as this is ObjC API**. For example, use `NSString` instead of `String`.
-
+Note that in the mapping closures of both `signal(for:)` and `feed` methods you must be explicit about argument and return types.
 
 ## Reactive Data Sources
 
@@ -413,7 +414,7 @@ names[1] = "Mark"    // prints: array ["Steve", "Mark"], change: .updates([1])
 Observable array can be mapped or filtered. For example, if we map our array
 
 ```
-names.map { $0.characters.count }.observeNext { event in
+names.map { $0.characters.count }.observeNext { e in
   print("array: \(e.source), change: \(e.change)")
 }
 ```
@@ -548,7 +549,7 @@ There are many other methods. Just look at the code reference or source.
 ## Requirements
 
 * iOS 8.0+ / macOS 10.9+ / tvOS 9.0+
-* Xcode 8
+* Xcode 9
 
 ## Communication
 

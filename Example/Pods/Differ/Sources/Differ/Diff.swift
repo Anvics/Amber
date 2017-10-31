@@ -1,26 +1,17 @@
-
-public protocol DiffProtocol: Collection, Sequence {
+public protocol DiffProtocol: Collection {
 
     associatedtype DiffElementType
-
-    #if swift(>=3.1)
-    // The typealias is causing crashes in SourceKitService under Swift 3.1 snapshots.
-    #else
-    // TODO: Verify that the typealias workaround is still required when Xcode 8.3 is released.
-    typealias Index = Int
-    #endif
 
     var elements: [DiffElementType] { get }
 }
 
-/**
- A sequence of deletions and insertions where deletions point to locations in the source and insertions point to locations in the output.
- Examples:
- "12" -> "": D(0)D(1)
- "" -> "12": I(0)I(1)
-
- SeeAlso: Diff
- */
+/// A sequence of deletions and insertions where deletions point to locations in the source and insertions point to locations in the output.
+/// Examples:
+/// ```
+/// "12" -> "": D(0)D(1)
+/// "" -> "12": I(0)I(1)
+/// ```
+/// - SeeAlso: Diff
 public struct Diff: DiffProtocol {
 
     public enum Element {
@@ -30,7 +21,8 @@ public struct Diff: DiffProtocol {
 
     /// Returns the position immediately after the given index.
     ///
-    /// - Parameter i: A valid index of the collection. `i` must be less than
+    /// - Parameters:
+    ///   - i: A valid index of the collection. `i` must be less than
     ///   `endIndex`.
     /// - Returns: The index value immediately after `i`.
     public func index(after i: Int) -> Int {
@@ -109,42 +101,9 @@ extension Trace {
     }
 }
 
-public extension String {
-
-    /// Creates a diff between the calee and `to` string
-    ///
-    /// - parameter to: a string to compare the calee to.
-    /// - complexity: O((N+M)*D)
-    /// - returns: a Diff between the calee and `to` string
-    public func diff(to: String) -> Diff {
-        if self == to {
-            return Diff(elements: [])
-        }
-        return characters.diff(to.characters)
-    }
-
-    /// Creates an extended diff (includes insertions, deletions, and moves) between the calee and `other` string
-    ///
-    /// - parameter other: a string to compare the calee to.
-    /// - complexity: O((N+M)*D)
-    /// - returns: an ExtendedDiff between the calee and `other` string
-    public func extendedDiff(_ other: String) -> ExtendedDiff {
-        if self == other {
-            return ExtendedDiff(
-                source: Diff(elements: []),
-                sourceIndex: [],
-                reorderedIndex: [],
-                elements: [],
-                moveIndices: Set()
-            )
-        }
-        return characters.extendedDiff(other.characters)
-    }
-}
-
 extension Array {
     func value(at index: Index) -> Iterator.Element? {
-        if index < 0 || index >= self.count {
+        if index < 0 || index >= count {
             return nil
         }
         return self[index]
@@ -164,9 +123,11 @@ public extension Collection {
 
     /// Creates a diff between the calee and `other` collection
     ///
-    /// - parameter other: a collection to compare the calee to
-    /// - complexity: O((N+M)*D)
-    /// - returns: a Diff between the calee and `other` collection
+    /// - Complexity: O((N+M)*D)
+    /// 
+    /// - Parameters:
+    ///   - other: a collection to compare the calee to
+    /// - Returns: a Diff between the calee and `other` collection
     public func diff(
         _ other: Self,
         isEqual: EqualityChecker<Self>
@@ -183,16 +144,16 @@ public extension Collection {
 
     /// Generates all traces required to create an output diff. See the [paper](http://www.xmailserver.org/diff2.pdf) for more information on traces.
     ///
-    /// - parameter to: other collection
-    ///
-    /// - returns: all traces required to create an output diff
+    /// - Parameters:
+    ///   - to: other collection
+    /// - Returns: all traces required to create an output diff
     public func diffTraces(
         to: Self,
         isEqual: EqualityChecker<Self>
     ) -> [Trace] {
-        if self.count == 0 && to.count == 0 {
+        if count == 0 && to.count == 0 {
             return []
-        } else if self.count == 0 {
+        } else if count == 0 {
             return tracesForInsertions(to: to)
         } else if to.count == 0 {
             return tracesForDeletions()
@@ -208,15 +169,15 @@ public extension Collection {
     ) -> [Trace] {
         return findPath(
             diffTraces(to: to, isEqual: isEqual),
-            n: Int(self.count.toIntMax()),
-            m: Int(to.count.toIntMax())
+            n: Int(count),
+            m: Int(to.count)
         )
     }
 
     fileprivate func tracesForDeletions() -> [Trace] {
         var traces = [Trace]()
-        for index in 0 ..< self.count.toIntMax() {
-            let intIndex = index.toIntMax()
+        for index in 0 ..< Int(count) {
+            let intIndex = Int(index)
             traces.append(Trace(from: Point(x: Int(intIndex), y: 0), to: Point(x: Int(intIndex) + 1, y: 0), D: 0))
         }
         return traces
@@ -224,8 +185,8 @@ public extension Collection {
 
     fileprivate func tracesForInsertions(to: Self) -> [Trace] {
         var traces = [Trace]()
-        for index in 0 ..< to.count.toIntMax() {
-            let intIndex = index.toIntMax()
+        for index in 0 ..< Int(to.count) {
+            let intIndex = Int(index)
             traces.append(Trace(from: Point(x: 0, y: Int(intIndex)), to: Point(x: 0, y: Int(intIndex) + 1), D: 0))
         }
         return traces
@@ -236,8 +197,8 @@ public extension Collection {
         isEqual: (Iterator.Element, Iterator.Element) -> Bool
     ) -> [Trace] {
 
-        let fromCount = Int(self.count.toIntMax())
-        let toCount = Int(to.count.toIntMax())
+        let fromCount = Int(count)
+        let toCount = Int(to.count)
         var traces = Array<Trace>()
 
         let max = fromCount + toCount // this is arbitrary, maximum difference between from and to. N+M assures that this algorithm always finds from diff
@@ -348,21 +309,21 @@ public extension Collection {
 
 public extension Collection where Iterator.Element: Equatable {
 
-    /// - seealso: `diff(_:isEqual:)`
+    /// - SeeAlso: `diff(_:isEqual:)`
     public func diff(
         _ other: Self
     ) -> Diff {
         return diff(other, isEqual: { $0 == $1 })
     }
 
-    /// - seealso: `diffTraces(to:isEqual:)`
+    /// - SeeAlso: `diffTraces(to:isEqual:)`
     public func diffTraces(
         to: Self
     ) -> [Trace] {
         return diffTraces(to: to, isEqual: { $0 == $1 })
     }
 
-    /// - seealso: `outputDiffPathTraces(to:isEqual:)`
+    /// - SeeAlso: `outputDiffPathTraces(to:isEqual:)`
     public func outputDiffPathTraces(
         to: Self
     ) -> [Trace] {

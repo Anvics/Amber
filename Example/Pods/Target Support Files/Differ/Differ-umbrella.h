@@ -11,6 +11,6 @@
 #endif
 
 
-FOUNDATION_EXPORT double DiffVersionNumber;
-FOUNDATION_EXPORT const unsigned char DiffVersionString[];
+FOUNDATION_EXPORT double DifferVersionNumber;
+FOUNDATION_EXPORT const unsigned char DifferVersionString[];
 

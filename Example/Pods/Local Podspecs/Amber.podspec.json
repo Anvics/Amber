@@ -1,8 +1,8 @@
 {
   "name": "Amber",
-  "version": "1.0.0",
+  "version": "1.0.15",
   "summary": "flexible and convenient iOS architecture based on Flex & Elm",
-  "description": "TODO: Add long description of the pod here.",
+  "description": "Amber is flexible and convenient iOS architecture based on Flex & Elm.\nIt uses Reducer to process Actions and Router to process Transitions.",
   "homepage": "https://github.com/Anvics/Amber",
   "license": {
     "type": "MIT",
@@ -13,7 +13,7 @@
   },
   "source": {
     "git": "https://github.com/Anvics/Amber.git",
-    "tag": "1.0.0"
+    "tag": "1.0.15"
   },
   "platforms": {
     "ios": "9.0"
@@ -22,7 +22,7 @@
   "frameworks": "UIKit",
   "dependencies": {
     "Bond": [
-      "~> 6.3.0"
+      "~> 6.5.0"
     ]
   }
 }

@@ -30,20 +30,110 @@ import ReactiveKit
 import BNDProtocolProxyBase
 #endif
 
-public typealias ArgumentExtractor = (Int, UnsafeMutableRawPointer?) -> Void
-public typealias ReturnValueSetter = (UnsafeMutableRawPointer?) -> Void
+private extension BNDInvocation {
 
-fileprivate func arg<T>(_ extractor: ArgumentExtractor, _ pos: Int) -> T {
-  let arg = UnsafeMutablePointer<T>.allocate(capacity: 1)
-  extractor(pos, arg)
-  let result = arg.pointee
-  arg.deallocate(capacity: 1)
-  return result
+ func readArgument<T>(_ index: Int) -> T {
+    let size = Int(methodSignature.getArgumentSize(at: UInt(index)))
+    let alignment = Int(methodSignature.getArgumentAlignment(at: UInt(index)))
+
+    let pointer = UnsafeMutableRawPointer.allocate(bytes: size, alignedTo: alignment)
+    getArgument(pointer, at: index)
+
+    defer {
+      pointer.deallocate(bytes: size, alignedTo: alignment)
+    }
+
+    let type = methodSignature.getArgumentType(at: UInt(index))
+    switch type {
+    case NSObjCCharType:
+      return NSNumber(value: pointer.assumingMemoryBound(to: CChar.self).pointee) as! T
+    case NSObjCShortType:
+      return NSNumber(value: pointer.assumingMemoryBound(to: CShort.self).pointee) as! T
+    case NSObjCIntType:
+      return NSNumber(value: pointer.assumingMemoryBound(to: CInt.self).pointee) as! T
+    case NSObjCLongType:
+      return NSNumber(value: pointer.assumingMemoryBound(to: CLong.self).pointee) as! T
+    case NSObjCLonglongType:
+      return NSNumber(value: pointer.assumingMemoryBound(to: CLongLong.self).pointee) as! T
+    case NSObjCUCharType:
+      return NSNumber(value: pointer.assumingMemoryBound(to: CUnsignedChar.self).pointee) as! T
+    case NSObjCUShortType:
+      return NSNumber(value: pointer.assumingMemoryBound(to: CUnsignedShort.self).pointee) as! T
+    case NSObjCUIntType:
+      return NSNumber(value: pointer.assumingMemoryBound(to: CUnsignedInt.self).pointee) as! T
+    case NSObjCULongType:
+      return NSNumber(value: pointer.assumingMemoryBound(to: CUnsignedLong.self).pointee) as! T
+    case NSObjCULonglongType:
+      return NSNumber(value: pointer.assumingMemoryBound(to: CUnsignedLongLong.self).pointee) as! T
+    case NSObjCFloatType:
+     return NSNumber(value: pointer.assumingMemoryBound(to: CFloat.self).pointee) as! T
+    case NSObjCDoubleType:
+     return NSNumber(value: pointer.assumingMemoryBound(to: CDouble.self).pointee) as! T
+    case NSObjCBoolType:
+      return NSNumber(value: pointer.assumingMemoryBound(to: CBool.self).pointee) as! T
+    case NSObjCSelectorType:
+      return pointer.assumingMemoryBound(to: Optional<Selector>.self).pointee as! T
+    case NSObjCObjectType:
+      return pointer.assumingMemoryBound(to: Optional<AnyObject>.self).pointee as! T
+   default:
+      return pointer.assumingMemoryBound(to: T.self).pointee
+    }
+  }
+
+ func writeReturnValue<T>(_ value: T) {
+    guard methodSignature.methodReturnLength > 0 else { return }
+
+    let size = methodSignature.getReturnArgumentSize()
+    let alignment = methodSignature.getReturnArgumentAlignment()
+    let type = methodSignature.getReturnArgumentType()
+
+  func write<U, V>(_ value: V, as type: U.Type) {
+      let pointer = UnsafeMutablePointer<U>.allocate(capacity: 1)
+      pointer.initialize(to: value as! U, count: 1)
+      setReturnValue(pointer)
+      pointer.deallocate(capacity: 1)
+    }
+
+    switch type {
+    case NSObjCCharType:
+      write(value as! NSNumber, as: CChar.self)
+    case NSObjCShortType:
+      write(value as! NSNumber, as: CShort.self)
+    case NSObjCIntType:
+      write(value as! NSNumber, as: CInt.self)
+    case NSObjCLongType:
+      write(value as! NSNumber, as: CLong.self)
+    case NSObjCLonglongType:
+      write(value as! NSNumber, as: CLongLong.self)
+    case NSObjCUCharType:
+      write(value as! NSNumber, as: CUnsignedChar.self)
+    case NSObjCUShortType:
+      write(value as! NSNumber, as: CUnsignedShort.self)
+    case NSObjCUIntType:
+      write(value as! NSNumber, as: CUnsignedInt.self)
+    case NSObjCULongType:
+      write(value as! NSNumber, as: CUnsignedLong.self)
+    case NSObjCULonglongType:
+      write(value as! NSNumber, as: CUnsignedLongLong.self)
+    case NSObjCFloatType:
+      write(value as! NSNumber, as: CFloat.self)
+    case NSObjCDoubleType:
+      write(value as! NSNumber, as: CDouble.self)
+    case NSObjCBoolType:
+      write(value as! NSNumber, as: CBool.self)
+    case NSObjCSelectorType:
+      write(value, as: Optional<Selector>.self)
+    case NSObjCObjectType:
+      write(value, as: Optional<AnyObject>.self)
+    default:
+      write(value, as: T.self)
+    }
+  }
 }
 
 public class ProtocolProxy: BNDProtocolProxyBase {
 
-  private var invokers: [Selector: (ArgumentExtractor, ReturnValueSetter?) -> Void] = [:]
+  private var invokers: [Selector: (BNDInvocation) -> Void] = [:]
   private var handlers: [Selector: Any] = [:]
   private weak var object: NSObject?
   private let setter: Selector
@@ -68,15 +158,15 @@ public class ProtocolProxy: BNDProtocolProxyBase {
     return invokers[selector] != nil
   }
 
-  public override func invoke(with selector: Selector, argumentExtractor: @escaping ArgumentExtractor, setReturnValue: ReturnValueSetter?) {
-    guard let invoker = invokers[selector] else { return }
-    invoker(argumentExtractor, setReturnValue)
+  public override func handle(_ invocation: BNDInvocation) {
+    guard let invoker = invokers[invocation.selector] else { return }
+    invoker(invocation)
   }
 
-  private func registerInvoker<R>(for selector: Selector, block: @escaping () -> R) -> Disposable {
-    invokers[selector] = { _, setReturnValue in
-      var r = block()
-      if let setReturnValue = setReturnValue { setReturnValue(&r) }
+  private func registerInvoker0<R>(for selector: Selector, block: @escaping () -> R) -> Disposable {
+    invokers[selector] = { invocation in
+      let result = block()
+      invocation.writeReturnValue(result)
     }
     registerDelegate()
     return BlockDisposable { [weak self] in
@@ -85,10 +175,10 @@ public class ProtocolProxy: BNDProtocolProxyBase {
     }
   }
 
-  private func registerInvoker<T, R>(for selector: Selector, block: @escaping (T) -> R) -> Disposable {
-    invokers[selector] = { extractor, setReturnValue in
-      var r = block(arg(extractor, 2))
-      if let setReturnValue = setReturnValue { setReturnValue(&r) }
+  private func registerInvoker1<T, R>(for selector: Selector, block: @escaping (T) -> R) -> Disposable {
+    invokers[selector] = { invocation in
+      let result = block(invocation.readArgument(2))
+      invocation.writeReturnValue(result)
     }
     registerDelegate()
     return BlockDisposable { [weak self] in
@@ -97,10 +187,10 @@ public class ProtocolProxy: BNDProtocolProxyBase {
     }
   }
 
-  private func registerInvoker<T, U, R>(for selector: Selector, block: @escaping (T, U) -> R) -> Disposable {
-    invokers[selector] = { extractor, setReturnValue in
-      var r = block(arg(extractor, 2), arg(extractor, 3))
-      if let setReturnValue = setReturnValue { setReturnValue(&r) }
+  private func registerInvoker2<T, U, R>(for selector: Selector, block: @escaping (T, U) -> R) -> Disposable {
+    invokers[selector] = { invocation in
+      let result = block(invocation.readArgument(2), invocation.readArgument(3))
+      invocation.writeReturnValue(result)
     }
     registerDelegate()
     return BlockDisposable { [weak self] in
@@ -109,10 +199,10 @@ public class ProtocolProxy: BNDProtocolProxyBase {
     }
   }
 
-  private func registerInvoker<T, U, V, R>(for selector: Selector, block: @escaping (T, U, V) -> R) -> Disposable {
-    invokers[selector] = { extractor, setReturnValue in
-      var r = block(arg(extractor, 2), arg(extractor, 3), arg(extractor, 4))
-      if let setReturnValue = setReturnValue { setReturnValue(&r) }
+  private func registerInvoker3<T, U, V, R>(for selector: Selector, block: @escaping (T, U, V) -> R) -> Disposable {
+    invokers[selector] = { invocation in
+      let result = block(invocation.readArgument(2), invocation.readArgument(3), invocation.readArgument(4))
+      invocation.writeReturnValue(result)
     }
     registerDelegate()
     return BlockDisposable { [weak self] in
@@ -121,10 +211,10 @@ public class ProtocolProxy: BNDProtocolProxyBase {
     }
   }
 
-  private func registerInvoker<T, U, V, W, R>(for selector: Selector, block: @escaping (T, U, V, W) -> R) -> Disposable {
-    invokers[selector] = { extractor, setReturnValue in
-      var r = block(arg(extractor, 2), arg(extractor, 3), arg(extractor, 4), arg(extractor, 5))
-      if let setReturnValue = setReturnValue { setReturnValue(&r) }
+  private func registerInvoker4<T, U, V, W, R>(for selector: Selector, block: @escaping (T, U, V, W) -> R) -> Disposable {
+    invokers[selector] = { invocation in
+      let result = block(invocation.readArgument(2), invocation.readArgument(3), invocation.readArgument(4), invocation.readArgument(5))
+      invocation.writeReturnValue(result)
     }
     registerDelegate()
     return BlockDisposable { [weak self] in
@@ -133,10 +223,10 @@ public class ProtocolProxy: BNDProtocolProxyBase {
     }
   }
 
-  private func registerInvoker<T, U, V, W, X, R>(for selector: Selector, block: @escaping (T, U, V, W, X) -> R) -> Disposable {
-    invokers[selector] = { extractor, setReturnValue in
-      var r = block(arg(extractor, 2), arg(extractor, 3), arg(extractor, 4), arg(extractor, 5), arg(extractor, 6))
-      if let setReturnValue = setReturnValue { setReturnValue(&r) }
+  private func registerInvoker5<T, U, V, W, X, R>(for selector: Selector, block: @escaping (T, U, V, W, X) -> R) -> Disposable {
+    invokers[selector] = { invocation in
+      let result = block(invocation.readArgument(2), invocation.readArgument(3), invocation.readArgument(4), invocation.readArgument(5), invocation.readArgument(6))
+      invocation.writeReturnValue(result)
     }
     registerDelegate()
     return BlockDisposable { [weak self] in
@@ -170,7 +260,7 @@ public class ProtocolProxy: BNDProtocolProxyBase {
   public func signal<S, R>(for selector: Selector, dispatch: @escaping (PublishSubject<S, NoError>) -> R) -> SafeSignal<S> {
     return _signal(for: selector) { [weak self] subject in
       guard let me = self else { return NonDisposable.instance }
-      return me.registerInvoker(for: selector) { () -> R in
+      return me.registerInvoker0(for: selector) { () -> R in
         return dispatch(subject)
       }
     }
@@ -187,7 +277,7 @@ public class ProtocolProxy: BNDProtocolProxyBase {
   public func signal<A, S, R>(for selector: Selector, dispatch: @escaping (PublishSubject<S, NoError>, A) -> R) -> SafeSignal<S> {
     return _signal(for: selector) { [weak self] subject in
       guard let me = self else { return NonDisposable.instance }
-      return me.registerInvoker(for: selector) { (a: A) -> R in
+      return me.registerInvoker1(for: selector) { (a: A) -> R in
         return dispatch(subject, a)
       }
     }
@@ -204,7 +294,7 @@ public class ProtocolProxy: BNDProtocolProxyBase {
   public func signal<A, B, S, R>(for selector: Selector, dispatch: @escaping (PublishSubject<S, NoError>, A, B) -> R) -> SafeSignal<S> {
     return _signal(for: selector) { [weak self] subject in
       guard let me = self else { return NonDisposable.instance }
-      return me.registerInvoker(for: selector) { (a: A, b: B) -> R in
+      return me.registerInvoker2(for: selector) { (a: A, b: B) -> R in
         return dispatch(subject, a, b)
       }
     }
@@ -221,7 +311,7 @@ public class ProtocolProxy: BNDProtocolProxyBase {
   public func signal<A, B, C, S, R>(for selector: Selector, dispatch: @escaping (PublishSubject<S, NoError>, A, B, C) -> R) -> SafeSignal<S> {
     return _signal(for: selector) { [weak self] subject in
       guard let me = self else { return NonDisposable.instance }
-      return me.registerInvoker(for: selector) { (a: A, b: B, c: C) -> R in
+      return me.registerInvoker3(for: selector) { (a: A, b: B, c: C) -> R in
         return dispatch(subject, a, b, c)
       }
     }
@@ -238,7 +328,7 @@ public class ProtocolProxy: BNDProtocolProxyBase {
   public func signal<A, B, C, D, S, R>(for selector: Selector, dispatch: @escaping (PublishSubject<S, NoError>, A, B, C, D) -> R) -> SafeSignal<S> {
     return _signal(for: selector) { [weak self] subject in
       guard let me = self else { return NonDisposable.instance }
-      return me.registerInvoker(for: selector) { (a: A, b: B, c: C, d: D) -> R in
+      return me.registerInvoker4(for: selector) { (a: A, b: B, c: C, d: D) -> R in
         return dispatch(subject, a, b, c, d)
       }
     }
@@ -255,7 +345,7 @@ public class ProtocolProxy: BNDProtocolProxyBase {
   public func signal<A, B, C, D, E, S, R>(for selector: Selector, dispatch: @escaping (PublishSubject<S, NoError>, A, B, C, D, E) -> R) -> SafeSignal<S> {
     return _signal(for: selector) { [weak self] subject in
       guard let me = self else { return NonDisposable.instance }
-      return me.registerInvoker(for: selector) { (a: A, b: B, c: C, d: D, e: E) -> R in
+      return me.registerInvoker5(for: selector) { (a: A, b: B, c: C, d: D, e: E) -> R in
         return dispatch(subject, a, b, c, d, e)
       }
     }

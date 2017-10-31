@@ -24,7 +24,7 @@
 
 import Foundation
 import ReactiveKit
-import Diff
+import Differ
 
 public enum Observable2DArrayChange {
   case reset
@@ -117,7 +117,7 @@ public struct Observable2DArraySection<Metadata, Item>: Collection {
       return items[index]
     }
   }
-  
+
 }
 
 public class Observable2DArray<SectionMetadata, Item>: SignalProtocol {

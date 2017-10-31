@@ -35,7 +35,6 @@ public protocol AmberController: class, AmberPresenter, AmberPresentable {
 }
 
 public extension AmberController{
-    typealias State = Reducer.State
     typealias InputActionListener = (Reducer.InputAction) -> Void
     typealias OutputActionListener = (Reducer.OutputAction) -> Void
     

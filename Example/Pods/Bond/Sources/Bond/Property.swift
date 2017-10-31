@@ -22,50 +22,24 @@
 //  THE SOFTWARE.
 //
 
-/// An event of a sequence.
-public enum Event<Element, Error: Swift.Error> {
+import ReactiveKit
+import Foundation
 
-  /// An event that carries next element.
-  case next(Element)
+extension Property {
 
-  /// An event that represents failure. Carries an error.
-  case failed(Error)
-
-  /// An event that marks the completion of a sequence.
-  case completed
-}
-
-extension Event {
-
-  /// Return `true` in case of `.failure` or `.completed` event.
-  public var isTerminal: Bool {
-    switch self {
-    case .next:
-      return false
-    default:
-      return true
+  /// Transform the `getter` and `setter` by applying a `transform` on them.
+  public func bidirectionalMap<U>(to getTransform: @escaping (Element) -> U,
+                                  from setTransform: @escaping (U) -> Element) -> DynamicSubject<U> {
+    return DynamicSubject<U>(
+      target: self,
+      signal: eraseType(),
+      context: .immediate,
+      get: { (property) -> U in
+        return getTransform(property.value)
+    },
+      set: { (propery, value) in
+        propery.value = setTransform(value)
     }
-  }
-
-  /// Returns the next element, or nil if the event is not `.next`
-  public var element: Element? {
-    switch self {
-    case .next(let element):
-      return element
-
-    default:
-      return nil
-    }
-  }
-
-  /// Return the failed error, or nil if the event is not `.failed`
-  public var error: Error? {
-    switch self {
-    case .failed(let error):
-      return error
-
-    default:
-      return nil
-    }
+    )
   }
 }
