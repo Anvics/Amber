@@ -23,34 +23,15 @@ Amber is flexible architecture based on Elm & Flux ideas and developed specifica
 
 **View**: is plain mapping of the state into the user interface. It subscribes to current state and redraws itself accordingly to the new state. It also responsible for sending Actions and Transitions to the Store. 
 
+##In depth explanation
+To come soon..
 
-## Benefits
-
-## Where to use
-
-## In depth overview
-
-### State
-
-### Actions
-
-### Reducer
-
-### Transition
-
-### Router
-
-### Store
-
-### View
-
-### Embedding
-
-### Middleware
-
-## Best practices
+## Amber module for generamba
+Here is [amber module](https://github.com/Anvics/AmberModule) for 
+[Generamba](https://github.com/rambler-digital-solutions/Generamba)
 
 ## Example
+You can check out simple example of Amber usage: [TestProject](https://github.com/Anvics/AmberExample)
 
 ## Installation
 
