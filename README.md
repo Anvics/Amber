@@ -24,6 +24,58 @@ Amber is flexible architecture based on Elm & Flux ideas and developed specifica
 
 **Controller**: is plain mapping of the state into the user interface. It subscribes to current state and updates view accordingly to the new state. It also responsible for sending Actions and Transitions to the Store. 
 
+## Benefits
+
+– makes application behavior more predictable;
+
+– code stays good structured as your application grows;
+
+– allow you to intercept all application events;
+
+– easier to refactor and modify your code.
+
+## In depth overview
+
+### State
+
+State is a struct that stores all data needed for your module. For example:
+
+```
+struct FeedState: AmberState {
+    var description: String {
+        return "isLoading: \(isLoading), items: \(feedItems.count)"
+    }
+    
+    var isLoading = true
+    var feedItems: [FeedItem] = []
+
+    init(data: Void) { }
+}
+```
+State should not store any UI components but it should store all the data needed to unambiguously display the view i.e. for the same state your view should always looks the same. 
+
+### Actions
+
+Action is enum that holds all the actions that can happen inside a module. For example:
+
+```
+enum FeedAction: AmberAction{
+    case itemsLoaded([FeedItem])
+    case like(Int)
+}
+```
+
+### Reducer
+
+### Transition
+
+### Router
+
+### Store
+
+### View
+
+
 ## Schema
 ![](Assets/overview.png)
 
