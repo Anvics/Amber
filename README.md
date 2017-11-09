@@ -1,6 +1,7 @@
 ![](Assets/amberLogo2.png)
 # Amber
 
+![](https://img.shields.io/badge/Swift-4.0-orange.svg)
 [![Version](https://img.shields.io/cocoapods/v/Amber.svg?style=flat)](http://cocoapods.org/pods/Amber)
 [![License](https://img.shields.io/cocoapods/l/Amber.svg?style=flat)](http://cocoapods.org/pods/Amber)
 [![Platform](https://img.shields.io/cocoapods/p/Amber.svg?style=flat)](http://cocoapods.org/pods/Amber)
@@ -95,7 +96,7 @@ class FeedReducer: AmberReducer{
     /* other code */
 }
 ```
-Reduce function should be [pure function](https://en.wikipedia.org/wiki/Pure_function). 
+Reduce function should be [pure function](https://en.wikipedia.org/wiki/Pure_function).
 
 ### Transition
 
