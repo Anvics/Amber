@@ -1,3 +1,4 @@
+![](Assets/amberLogo.png)
 # Amber
 
 [![Version](https://img.shields.io/cocoapods/v/Amber.svg?style=flat)](http://cocoapods.org/pods/Amber)
@@ -9,7 +10,7 @@
 Amber is flexible architecture based on Elm & Flux ideas and developed specifically for iOS. It separetes components of a module into six parts: 
 
 
-**State**: is plain struct responsible for holding all data nased on which data is displayed.
+**State**: is plain struct responsible for holding all data based on which interface is drawn.
 
 **Actions**: are events that can happen in module: button press, data loaded, etc. 
 
@@ -23,7 +24,7 @@ Amber is flexible architecture based on Elm & Flux ideas and developed specifica
 
 **View**: is plain mapping of the state into the user interface. It subscribes to current state and redraws itself accordingly to the new state. It also responsible for sending Actions and Transitions to the Store. 
 
-##In depth explanation
+## In depth explanation
 To come soon..
 
 ## Amber module for generamba
