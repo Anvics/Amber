@@ -22,10 +22,10 @@ Amber is flexible architecture based on Elm & Flux ideas and developed specifica
 
 **Store**: holds reference to Reducer, Router and current State.
 
-**View**: is plain mapping of the state into the user interface. It subscribes to current state and redraws itself accordingly to the new state. It also responsible for sending Actions and Transitions to the Store. 
+**Controller**: is plain mapping of the state into the user interface. It subscribes to current state and updates view accordingly to the new state. It also responsible for sending Actions and Transitions to the Store. 
 
-## In depth explanation
-To come soon..
+## Schema
+![](Assets/overview.png)
 
 ## Amber module for generamba
 Here is [amber module](https://github.com/Anvics/AmberModule) for 
