@@ -34,6 +34,9 @@ Amber is flexible architecture based on Elm & Flux ideas and developed specifica
 
 – easier to refactor and modify your code.
 
+## Schema
+![](Assets/overview.png)
+
 ## In depth overview
 
 ### State
@@ -67,6 +70,33 @@ enum FeedAction: AmberAction{
 
 ### Reducer
 
+Reducer is a class that is mainly responsible for processing Actions. It takes as input a current state and an action which is occurred and should return new state.
+
+```
+class FeedReducer: AmberReducer{
+    /* other code */
+    
+    func reduce(action: FeedAction, state: FeedState,
+                performTransition: @escaping (FeedTransition) -> Void,
+                performAction: @escaping (FeedAction) -> Void,
+                performOutputAction: @escaping (FeedOutputAction) -> Void) -> FeedState{
+        var newState = state
+        switch action {
+        case .itemsLoaded(let items):
+            newState.isLoading = false
+            newState.feedItems = items
+        case .like(let index):
+            let item = newState.feedItems[index]
+            item.isLiked = !item.isLiked
+        }
+        return newState
+    }
+    
+    /* other code */
+}
+```
+Reduce function should be [pure function](https://en.wikipedia.org/wiki/Pure_function). 
+
 ### Transition
 
 ### Router
@@ -76,8 +106,7 @@ enum FeedAction: AmberAction{
 ### View
 
 
-## Schema
-![](Assets/overview.png)
+
 
 ## Amber module for generamba
 Here is [amber module](https://github.com/Anvics/AmberModule) for 
