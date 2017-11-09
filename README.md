@@ -1,4 +1,4 @@
-![](Assets/amberLogo.png)
+![](Assets/amberLogo2.png)
 # Amber
 
 [![Version](https://img.shields.io/cocoapods/v/Amber.svg?style=flat)](http://cocoapods.org/pods/Amber)
