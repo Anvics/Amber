@@ -96,7 +96,18 @@ class FeedReducer: AmberReducer{
     /* other code */
 }
 ```
-Reduce function should be [pure function](https://en.wikipedia.org/wiki/Pure_function).
+Reduce function should be [pure function](https://en.wikipedia.org/wiki/Pure_function). Reducer is not required to change state for every action, for any of them he can perform transitions:
+
+```
+        case .showUser(let user):
+            if user.isCurrent { performTransition(.profile) }
+            else { performTransition(.information(user)) } 
+```
+and perform other actions:
+```
+        case .reloadItems:
+            itemsLoader.load(completion: { items in performAction(.itemsLoaded(items)) })
+```
 
 ### Transition
 
