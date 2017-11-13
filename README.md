@@ -294,7 +294,7 @@ enum ProfileTransition: AmberAction, ConfirmationRequirable{
 Using middlewares helps you to write less code and reuse such logic between all modules. Other common cases of middlewares are: AnalyticsMiddleware (send events to your favorite analytics), NotificationMiddleware (notifies user that some event was performed), ServerMiddleware (performs server request), ErrorProcessing, Authorization (presents authorization screen for unauthorized users) and so on.
 
 ## Amber module for generamba
-Here is [amber module](https://github.com/Anvics/AmberModule) for 
+Amber has it's own [module](https://github.com/Anvics/AmberModule) for 
 [Generamba](https://github.com/rambler-digital-solutions/Generamba)
 
 ## Example
