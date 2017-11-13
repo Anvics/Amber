@@ -247,8 +247,51 @@ FeedAction.itemsLoaded([Paris, Flying man, Old Car]) -> isLoading: false, items:
 ----------------------------------------
 FeedTransition.profile -> isLoading: false, items: 3
 ```
+Lets consider more complicated case: our app has some actions that needs user confirmation before they can be performed. We could solve it in a such way:
 
+```
+protocol ConfirmationRequirable{
+    var needsConfirmation: Bool { get }
+}
 
+class ConfirmationMiddleware: AmberMiddleware{
+    func perform(event: Any, route: AmberRoutePerformer, performBlock: @escaping () -> ()){
+        //only if event that should occure is ConfirmationRequirable AND its needsConfirmation is true we proceed
+        guard let crEvent = event as? ConfirmationRequirable, crEvent.needsConfirmation else{
+            //otherwise we say that this action should be performed without any side affects
+            //calling performBlock() invokes next Middleware to process this action or if it is the last registered Middleware, delivers this event to designated reducer/router
+            performBlock()
+            return
+        }
+        
+        //we presents ConfirmationModule (popup)
+        _ = route.present(ConfirmationModule) { a in
+            //only if (and when) user confirmed this event we forwarding it
+            if a == .confirmed { performBlock() }
+        }
+    }
+}
+```
+
+After registering it `Amber.main.registerSharedMiddleware(LoggingMiddleware(), ConfirmationMiddleware())` and conforming any Event to `ConfirmationRequirable`:
+```
+enum CartAction: AmberAction, ConfirmationRequirable{
+    case clearCart, reload
+
+    var needsConfirmation: Bool { return self == .clearCart }
+}
+```
+
+From now on after Cart's store will recieve `.clearCart` action, `ConfirmationMiddleware` will take over and present a popup. If user would press "Confirm" then the action will be delivered to CartReducer otherwise it won't be dispatched. You can even implement `ConfirmationRequirable` protocol in transitions:
+```
+enum ProfileTransition: AmberAction, ConfirmationRequirable{
+    case history, logout
+
+    var needsConfirmation: Bool { return self == .logout }
+}
+```
+
+Using middlewares helps you to write less code and reuse such logic between all modules. Other common cases of middlewares are: AnalyticsMiddleware (send events to your favorite analytics), NotificationMiddleware (notifies user that some event was performed), ServerMiddleware (performs server request), ErrorProcessing, Authorization (presents authorization screen for unauthorized users) and so on.
 
 ## Amber module for generamba
 Here is [amber module](https://github.com/Anvics/AmberModule) for 
