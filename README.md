@@ -62,7 +62,7 @@ State should not store any UI components but it should store all the data needed
 
 Action is enum that lists all actions that can happen inside a module. For example:
 
-```
+```Swift
 enum FeedAction: AmberAction{
     case itemsLoaded([FeedItem])
     case like(Int)
@@ -74,7 +74,7 @@ action cases should contain any data needed to process them.
 
 Reducer is a class that is mainly responsible for processing Actions. It takes as input a current state and an action which is occurred and should return new state.
 
-```
+```Swift
 class FeedReducer: AmberReducer{
     /* other code */
     
@@ -99,13 +99,13 @@ class FeedReducer: AmberReducer{
 ```
 Reduce function should be [pure function](https://en.wikipedia.org/wiki/Pure_function). Reducer is not required to change state for every action, for any of them it can perform transitions:
 
-```
+```Swift
         case .showUser(let user):
             if user.isCurrent { performTransition(.profile) }
             else { performTransition(.information(user)) } 
 ```
 or perform other actions:
-```
+```Swift
         case .reloadItems:
             itemsLoader.load(completion: { items in performAction(.itemsLoaded(items)) })
 ```
@@ -114,7 +114,7 @@ or perform other actions:
 
 Transition is enum that lists all transition that can happen in current module. For example:
 
-```
+```Swift
 enum FeedTransition: AmberTransition{
     case profile
     case showPhoto(UIImage)
@@ -125,7 +125,7 @@ Transitions like actions should contain any data needed to process them
 ### Router
 
 Router is class that performs transitions and processes output actions from presented/embedded modules. For example:
-```
+```Swift
 class FeedRouter: AmberRouter{
     func perform(transition: FeedTransition,
                  route: AmberRoutePerformer,
@@ -143,7 +143,7 @@ class FeedRouter: AmberRouter{
 
 Store is responsible for recieving actions and transitions, storing current state, router and reducer. Store is the only component that you should not override yourself – it is provided and implemented by Amber itself. You initialize store with Reducer and Router objects in your Controller as follows:
 
-```
+```Swift
 final class FeedController: UIViewController, AmberController {
 
     let store = AmberStore(reducer: FeedReducer(), router: FeedRouter())
@@ -154,7 +154,7 @@ final class FeedController: UIViewController, AmberController {
 
 Controller is the UIViewController subclass. It is responsible for binding state to UI and mapping user actions Actions/Transitions cases and sending them to store. For example:
 
-```
+```Swift
 //MARK: - Bindings
 extension FeedController{
     func bind(){
@@ -169,13 +169,13 @@ extension FeedController{
 
 There are two ways Controller can send Action events to Store:
 1) bind any event (like button tap) to Store property `action` in a reactive way:
-```
+```Swift
 plusButton.reactive.tap
     .replace(with: .increaseAmount)
     .bind(to: action)
 ```
 2) dispatch `Action` manually:
-```
+```Swift
 extension FeedController: UITableViewDelegate{
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath){
         store.perform(action: .like(indexPath.row))
@@ -183,7 +183,7 @@ extension FeedController: UITableViewDelegate{
 }    
 ```        
 The same is true about transitions:
-```
+```Swift
 extension FeedController{
     func bind(){
         profileButton.reactive.tap
@@ -208,7 +208,7 @@ Most preferred way to work with state is to bind or subscribe to it. If you need
 
 Middleware is one of the coolest Amber's feature. It can react to any Event (Action and Transition) before or after it happens. More important Middleware can intersect events and delay or even cancel them until some conditions are met. Example will follow bul lets start with a simple example – logging all events. All middleware implementations should conform to AmberMiddleware protocol:
 
-```
+```Swift
 public protocol AmberMiddleware{
     //Implement this function to process any event before it happens
     func process(state: Any, beforeEvent event: Any)
@@ -221,7 +221,7 @@ public protocol AmberMiddleware{
 }
 ```
 All this three functions have default implementations so in your Middleware you can implement only necessary ones. Logging Middleware will look as follows:
-```
+```Swift
 class LoggingMiddleware: AmberMiddleware{
     func process(state: Any, afterEvent event: Any, route: AmberRoutePerformer){
         print("----------------------------------------")
@@ -230,7 +230,7 @@ class LoggingMiddleware: AmberMiddleware{
 }
 ```
 You register it as follows:
-```
+```Swift
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
@@ -241,7 +241,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         /* other code... */
 ```
 After that all app events will be printed in the console:
-```
+```Swift
 ----------------------------------------
 FeedAction.itemsLoaded([Paris, Flying man, Old Car]) -> isLoading: false, items: 3
 ----------------------------------------
@@ -249,7 +249,7 @@ FeedTransition.profile -> isLoading: false, items: 3
 ```
 Lets consider more complicated case: our app has some actions that needs user confirmation before they can be performed. We could solve it in a such way:
 
-```
+```Swift
 protocol ConfirmationRequirable{
     var needsConfirmation: Bool { get }
 }
@@ -274,7 +274,7 @@ class ConfirmationMiddleware: AmberMiddleware{
 ```
 
 After registering it `Amber.main.registerSharedMiddleware(LoggingMiddleware(), ConfirmationMiddleware())` and conforming any Event to `ConfirmationRequirable`:
-```
+```Swift
 enum CartAction: AmberAction, ConfirmationRequirable{
     case clearCart, reload
 
@@ -283,7 +283,7 @@ enum CartAction: AmberAction, ConfirmationRequirable{
 ```
 
 From now on after Cart's store will recieve `.clearCart` action, `ConfirmationMiddleware` will take over and present a popup. If user would press "Confirm" then the action will be delivered to CartReducer otherwise it won't be dispatched. You can even implement `ConfirmationRequirable` protocol in transitions:
-```
+```Swift
 enum ProfileTransition: AmberAction, ConfirmationRequirable{
     case history, logout
 
