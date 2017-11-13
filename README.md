@@ -44,7 +44,7 @@ Amber is flexible architecture based on Elm & Flux ideas and developed specifica
 
 State is a struct that stores all data needed for your module. For example:
 
-```
+```Swift
 struct FeedState: AmberState {
     var description: String {
         return "isLoading: \(isLoading), items: \(feedItems.count)"
