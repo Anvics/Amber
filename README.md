@@ -201,9 +201,53 @@ extension FeedController: UITableViewDelegate{
 }
 ```
 
+Controller should not store in self no other properties than UIView objects. All other properties should be places in State.
 Most preferred way to work with state is to bind or subscribe to it. If you need to access it current value you can call `store.currentState()`.
 
 ### Middleware
+
+Middleware is one of the coolest Amber's feature. It can react to any Event (Action and Transition) before or after it happens. More important Middleware can intersect events and delay or even cancel them until some conditions are met. Example will follow bul lets start with a simple example – logging all events. All middleware implementations should conform to AmberMiddleware protocol:
+
+```
+public protocol AmberMiddleware{
+    //Implement this function to process any event before it happens
+    func process(state: Any, beforeEvent event: Any)
+    
+    //Implement this function to be able to delay or cancel any event before it will be directed to reducer
+    func perform(event: Any, onState state: Any, route: AmberRoutePerformer, performBlock: @escaping () -> ())
+    
+    //Implement this function to process event or state after event was dispatched.
+    func process(state: Any, afterEvent event: Any, route: AmberRoutePerformer)
+}
+```
+All this three functions have default implementations so in your Middleware you can implement only necessary ones. Logging Middleware will look as follows:
+```
+class LoggingMiddleware: AmberMiddleware{
+    func process(state: Any, afterEvent event: Any, route: AmberRoutePerformer){
+        print("----------------------------------------")
+        print("\(type(of: event)).\(event) -> \(state)")
+    }
+}
+```
+You register it as follows:
+```
+@UIApplicationMain
+class AppDelegate: UIResponder, UIApplicationDelegate {
+
+    var window: UIWindow?
+
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
+        Amber.main.registerSharedMiddleware(LoggingMiddleware())
+        /* other code... */
+```
+After that all app events will be printed in the console:
+```
+----------------------------------------
+FeedAction.itemsLoaded([Paris, Flying man, Old Car]) -> isLoading: false, items: 3
+----------------------------------------
+FeedTransition.profile -> isLoading: false, items: 3
+```
+
 
 
 ## Amber module for generamba
