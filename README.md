@@ -60,7 +60,7 @@ State should not store any UI components but it should store all the data needed
 
 ### Actions
 
-Action is enum that holds all the actions that can happen inside a module. For example:
+Action is enum that lists all actions that can happen inside a module. For example:
 
 ```
 enum FeedAction: AmberAction{
@@ -68,6 +68,7 @@ enum FeedAction: AmberAction{
     case like(Int)
 }
 ```
+action cases should contain any data needed to process them.
 
 ### Reducer
 
@@ -96,14 +97,14 @@ class FeedReducer: AmberReducer{
     /* other code */
 }
 ```
-Reduce function should be [pure function](https://en.wikipedia.org/wiki/Pure_function). Reducer is not required to change state for every action, for any of them he can perform transitions:
+Reduce function should be [pure function](https://en.wikipedia.org/wiki/Pure_function). Reducer is not required to change state for every action, for any of them it can perform transitions:
 
 ```
         case .showUser(let user):
             if user.isCurrent { performTransition(.profile) }
             else { performTransition(.information(user)) } 
 ```
-and perform other actions:
+or perform other actions:
 ```
         case .reloadItems:
             itemsLoader.load(completion: { items in performAction(.itemsLoaded(items)) })
@@ -111,13 +112,98 @@ and perform other actions:
 
 ### Transition
 
+Transition is enum that lists all transition that can happen in current module. For example:
+
+```
+enum FeedTransition: AmberTransition{
+    case profile
+    case showPhoto(UIImage)
+}
+```
+Transitions like actions should contain any data needed to process them
+
 ### Router
+
+Router is class that performs transitions and processes output actions from presented/embedded modules. For example:
+```
+class FeedRouter: AmberRouter{
+    func perform(transition: FeedTransition,
+                 route: AmberRoutePerformer,
+                 reducer: FeedReducer,
+                 performAction: @escaping (FeedAction) -> Void){
+        switch transition {
+        case .profile: _ = route.show(ProfileModule)
+        case .showPhoto(let image): _ = route.show(FeedItemModule, data: image)
+        }
+    }
+}
+```
 
 ### Store
 
-### View
+Store is responsible for recieving actions and transitions, storing current state, router and reducer. Store is the only component that you should not override yourself – it is provided and implemented by Amber itself. You initialize store with Reducer and Router objects in your Controller as follows:
+
+```
+final class FeedController: UIViewController, AmberController {
+
+    let store = AmberStore(reducer: FeedReducer(), router: FeedRouter())
+```
 
 
+### Controller
+
+Controller is the UIViewController subclass. It is responsible for binding state to UI and mapping user actions Actions/Transitions cases and sending them to store. For example:
+
+```
+//MARK: - Bindings
+extension FeedController{
+    func bind(){
+        profileButton.reactive.tap
+            .replace(with: .profile)
+            .bind(to: transition)
+        
+        state.map { $0.isLoading }.bind(to: activityIndicator.reactive.isAnimating)
+    }
+}
+```
+
+There are two ways Controller can send Action events to Store:
+1) bind any event (like button tap) to Store property `action` in a reactive way:
+```
+plusButton.reactive.tap
+    .replace(with: .increaseAmount)
+    .bind(to: action)
+```
+2) dispatch `Action` manually:
+```
+extension FeedController: UITableViewDelegate{
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath){
+        store.perform(action: .like(indexPath.row))
+    }
+}    
+```        
+The same is true about transitions:
+```
+extension FeedController{
+    func bind(){
+        profileButton.reactive.tap
+            .replace(with: .profile)
+            .bind(to: transition)
+    }
+}
+
+extension FeedController: UITableViewDelegate{
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath){
+        if let image = store.currentState().feedItems[indexPath.row].image{
+            store.perform(transition: .showPhoto(image))
+        }
+    }
+}
+```
+
+Most preferred way to work with state is to bind or subscribe to it. If you need to access it current value you can call `store.currentState()`.
+
+### Middleware
 
 
 ## Amber module for generamba
