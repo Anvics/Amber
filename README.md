@@ -307,7 +307,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 and set to empty "Main Interface" field in your project settings (otherwise it will override your `Amber.setInitial` code). 
 
 Of course you can set different initial screens based on any conditions:
-```
+```swift
 class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
@@ -320,12 +320,126 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
 ```
 ## Transitions & module communications
+### Types
+All transitions and embeddings should be performed in routers. Inside your router's perform function you recieve `route` object which implements different ways of presenting/dismissing another modules.
+You have three ways to present another module: 
+– `replace`: replaces `UIApplication.shared.keyWindow?.rootViewController` with given module;
+– `present`: presents new module;
+- `show`: if current module contains navigationController, then pushes new module; otherwise presents it.
 
-All transitions and embeddings should be performed in routers.
+And four ways to exit from current screen:
+– `dismiss`: dismisses current module;
+– `pop`: pops to previous module in navigation controller;
+– `popToRoot`: pops to first module in navigation controller's stack;
+– `close`: if module is embedded then unembeds it; if module is in navigationController, then pops; othervise dismisses it.
+
+For example:
+```swift
+class FeedRouter: AmberRouter{
+    func perform(transition: FeedTransition,
+                 route: AmberRoutePerformer,
+                 reducer: FeedReducer,
+                 performAction: @escaping (FeedAction) -> Void){
+        switch transition {
+        case .profile: _ = route.present(ProfileModule)
+        case .showPhoto: _ = route.show(FeedItemModule)
+        case .dismiss: route.close()
+        }
+    }
+}
+```
+
+### Initial data
+In Amber each module specifies directly what data is required for them to be presented. Other modules are forced to pass that data to them in order to present them. By default modules do not require any data:
+```swift
+struct ProfileState: AmberState {
+    var description: String { return "ProfileState" }
+
+    init(data: Void) { }
+}
+```
+If module needs any data to be presented then you should replace `Void` in State's `init` with that data type:
+```swift
+struct ProfileState: AmberState {
+    var description: String { return "ProfileState" }    
+    let id: Int
+    
+    init(data: Int) { self.id = data }
+}
+```
+After that other modules would be able to show Profile module only with requred data:
+```swift
+case .profile(let id): _ = route.present(ProfileModule, data: id)
+```
+The same is true for other types of presentation: show and replace.
+
+### Embedding
+Embedding is a special case of module presenting. What makes it different from any other presententations that it needs `UIView` object in which given module will be embedded:
+
+```swift
+class FeedItemRouter: AmberRouter{
+     func perform(transition: FeedItemTransition,
+                  route: AmberRoutePerformer,
+                  reducer: FeedItemReducer,
+                  performAction: @escaping (FeedItemAction) -> Void){
+        switch transition {
+        case .embedFilters(let view): _ = route.embed(FilterModule, inView: view)
+        }
+    }
+}
+```
+
+### Communications between modules
+Regardless of how another module was presented or even embedded, the communications between them are always working the same way. Lets call presenting module _Presenter_ and presented module _Presented_. _Presented_ is responsible for describing all the events it can produce (_PresentedOutputEvents_) and the events it can recieve (_PresentedInputEvents_). _Presenter_ decides whether it be listening for _PresentedOutputEvents_ and can pass _PresentedInputEvents_ to _Presented_. It works as followings: 
+In _Presenter_'s Reducer we declare _Presented_'s _PresentedInputEvents_ action block:
+
+```swift
+class FeedItemReducer: AmberReducer{    
+    var filterInput: FilterReducer.InputActionListener? //It is equal to ((FilterInputAction) -> Void)?
+```
+It is a function that we can perform to pass _PresentedInputEvents_ to _Presented_. This function is returned to us by `route` object when we presenting/embedding another module:
+```swift
+        case .embedFilters(let view): 
+            //this is how we pass this function to Reducer
+            reducer.filterInput = route.embed(FilterModule, inView: view)
+        }
+```
+If we are interested in _PresentedOutputEvents_ we can pass output listener block as extra argument:
+```swift
+        case .embedFilters(let view):
+            reducer.filterInput = route.embed(FilterModule, inView: view) { outputEvent in
+                switch outputEvent{
+                case .updateImage(let image): performAction(.setImage(image))
+                }
+            }
+        }
+```
+
+We process _PresentedInputEvents_ inside _Presented_'s Reducer `reduceInput` function:
+```swift
+class FilterReducer: AmberReducer{
+    /* other code */
+    func reduceInput(action: FilterInputAction, state: FilterState,
+                     performAction: @escaping (FilterAction) -> Void,
+                     performOutputAction: @escaping (FilterOutputAction) -> Void) -> FilterState{
+        var newState = state
+        switch action {
+        case .reset:
+            newState.saturation = 1
+            newState.brightness = 0
+            newState.contrast = 1
+        }
+        return newState
+    }
+```
+And we can send _PresentedOutputEvents_ actions from three places:
+– inside Reducer from `reduce` function via calling `performOutputAction(<OutputAction>)`;
+– inside Reducer from `reduceInput` function via calling `performOutputAction(<OutputAction>)`;
+– inside Controller by calling `store.performOutput(action: <OutputAction>)` or by binding to `outputAction` dynamic property.
 
 ## Amber module for generamba
 Amber has its own [module](https://github.com/Anvics/AmberModule) for 
-[Generamba](https://github.com/rambler-digital-solutions/Generamba)
+[Generamba](https://github.com/rambler-digital-solutions/Generamba) – so you won't write all this code by yourself.
 
 ## Example
 You can check out simple example of Amber usage: [TestProject](https://github.com/Anvics/AmberExample)
