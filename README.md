@@ -241,7 +241,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         /* other code... */
 ```
 After that all app events will be printed in the console:
-```Swift
+```
 ----------------------------------------
 FeedAction.itemsLoaded([Paris, Flying man, Old Car]) -> isLoading: false, items: 3
 ----------------------------------------
@@ -291,7 +291,37 @@ enum ProfileTransition: AmberAction, ConfirmationRequirable{
 }
 ```
 
-Using middlewares helps you to write less code and reuse such logic between all modules. Other common cases of middlewares are: AnalyticsMiddleware (send events to your favorite analytics), NotificationMiddleware (notifies user that some event was performed), ServerMiddleware (performs server request), ErrorProcessing, Authorization (presents authorization screen for unauthorized users) and so on.
+Using middlewares helps you to write less code and reuse logic between all modules. Other common cases of middlewares are: AnalyticsMiddleware (send events to your favorite analytics), NotificationMiddleware (notifies user that some event was performed), ServerMiddleware (performs server request), ErrorProcessing, Authorization (presents authorization screen for unauthorized users) and so on.
+
+## App's first screen
+
+You should set app's first screen in your `AppDelegate`:
+```swift
+class AppDelegate: UIResponder, UIApplicationDelegate {
+    var window: UIWindow?
+    
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
+        window = UIWindow(frame: UIScreen.main.bounds)
+        Amber.setInitial(module: FeedModule, window: window)
+```
+and set to empty "Main Interface" field in your project settings (otherwise it will override your `Amber.setInitial` code). 
+
+Of course you can set different initial screens based on any conditions:
+```
+class AppDelegate: UIResponder, UIApplicationDelegate {
+    var window: UIWindow?
+
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
+        window = UIWindow(frame: UIScreen.main.bounds)
+        if User.current.isAuthorized{
+            Amber.setInitial(module: FeedModule, window: window)
+        }else{
+            Amber.setInitial(module: AuthorizationModule, window: window)
+        }
+```
+## Transitions & module communications
+
+All transitions and embeddings should be performed in routers.
 
 ## Amber module for generamba
 Amber has its own [module](https://github.com/Anvics/AmberModule) for 
