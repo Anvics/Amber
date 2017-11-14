@@ -27,13 +27,13 @@ Amber is flexible architecture based on Elm & Flux ideas and developed specifica
 
 ## Benefits
 
-– makes application behavior more predictable;
+ – makes application behavior more predictable;
 
-– code stays good structured as your application grows;
+ – code stays good structured as your application grows;
 
-– allow you to intercept all application events;
+ – allow you to intercept all application events;
 
-– easier to refactor and modify your code.
+ – easier to refactor and modify your code.
 
 ## Schema
 ![](Assets/overview.png)
@@ -323,15 +323,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 ### Types
 All transitions and embeddings should be performed in routers. Inside your router's perform function you recieve `route` object which implements different ways of presenting/dismissing another modules.
 You have three ways to present another module: 
-– `replace`: replaces `UIApplication.shared.keyWindow?.rootViewController` with given module;
-– `present`: presents new module;
-- `show`: if current module contains navigationController, then pushes new module; otherwise presents it.
+ – `replace`: replaces `UIApplication.shared.keyWindow?.rootViewController` with given module;
+ – `present`: presents new module;
+ - `show`: if current module contains navigationController, then pushes new module; otherwise presents it.
 
 And four ways to exit from current screen:
-– `dismiss`: dismisses current module;
-– `pop`: pops to previous module in navigation controller;
-– `popToRoot`: pops to first module in navigation controller's stack;
-– `close`: if module is embedded then unembeds it; if module is in navigationController, then pops; othervise dismisses it.
+ – `dismiss`: dismisses current module;
+ – `pop`: pops to previous module in navigation controller;
+ – `popToRoot`: pops to first module in navigation controller's stack;
+ – `close`: if module is embedded then unembeds it; if module is in navigationController, then pops; othervise dismisses it.
 
 For example:
 ```swift
@@ -390,14 +390,14 @@ class FeedItemRouter: AmberRouter{
 ```
 
 ### Communications between modules
-Regardless of how another module was presented or even embedded, the communications between them are always working the same way. Lets call presenting module _Presenter_ and presented module _Presented_. _Presented_ is responsible for describing all the events it can produce (_PresentedOutputEvents_) and the events it can recieve (_PresentedInputEvents_). _Presenter_ decides whether it be listening for _PresentedOutputEvents_ and can pass _PresentedInputEvents_ to _Presented_. It works as followings: 
-In _Presenter_'s Reducer we declare _Presented_'s _PresentedInputEvents_ action block:
+Regardless of how another module was presented or even embedded, the communications between them are always working the same way. Lets call presenting module **Presenter** and presented module **Presented**. **Presented**is responsible for describing all the events it can produce (_PresentedOutputEvents_) and the events it can recieve (_PresentedInputEvents_). **Presenter** decides whether it be listening for _PresentedOutputEvents_ and can pass _PresentedInputEvents_ to _Presented_. It works as followings: 
+In **Presenter**'s Reducer we declare **Presented**'s _PresentedInputEvents_ action block:
 
 ```swift
 class FeedItemReducer: AmberReducer{    
     var filterInput: FilterReducer.InputActionListener? //It is equal to ((FilterInputAction) -> Void)?
 ```
-It is a function that we can perform to pass _PresentedInputEvents_ to _Presented_. This function is returned to us by `route` object when we presenting/embedding another module:
+It is a function that we can perform to pass _PresentedInputEvents_ to **Presented**. This function is returned to us by `route` object when we presenting/embedding another module:
 ```swift
         case .embedFilters(let view): 
             //this is how we pass this function to Reducer
@@ -415,7 +415,7 @@ If we are interested in _PresentedOutputEvents_ we can pass output listener bloc
         }
 ```
 
-We process _PresentedInputEvents_ inside _Presented_'s Reducer `reduceInput` function:
+We process _PresentedInputEvents_ inside **Presented**'s Reducer `reduceInput` function:
 ```swift
 class FilterReducer: AmberReducer{
     /* other code */
@@ -433,9 +433,9 @@ class FilterReducer: AmberReducer{
     }
 ```
 And we can send _PresentedOutputEvents_ actions from three places:
-– inside Reducer from `reduce` function via calling `performOutputAction(<OutputAction>)`;
-– inside Reducer from `reduceInput` function via calling `performOutputAction(<OutputAction>)`;
-– inside Controller by calling `store.performOutput(action: <OutputAction>)` or by binding to `outputAction` dynamic property.
+ – inside Reducer from `reduce` function via calling `performOutputAction(<OutputAction>)`;
+ – inside Reducer from `reduceInput` function via calling `performOutputAction(<OutputAction>)`;
+ – inside Controller by calling `store.performOutput(action: <OutputAction>)` or by binding to `outputAction` dynamic property.
 
 ## Amber module for generamba
 Amber has its own [module](https://github.com/Anvics/AmberModule) for 
