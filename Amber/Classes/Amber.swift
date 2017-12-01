@@ -64,5 +64,11 @@ public class Amber{
     public static func setInitial<Module: AmberController>(module: Module.Type, window: UIWindow!) where Module.Reducer.State.RequiredData == Void{
         setInitial(module: module, data: (), window: window)
     }
+    
+    public static func setBaseInitial(storyboardFile: String, storyboardID: String, window: UIWindow!){
+        let vc = UIStoryboard(name: storyboardFile, bundle: nil).instantiateViewController(withIdentifier: storyboardID)
+        window.rootViewController = vc
+        window.makeKeyAndVisible()
+    }
 }
 

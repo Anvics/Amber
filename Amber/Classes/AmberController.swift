@@ -28,7 +28,7 @@ public protocol AmberPresentable {
     static var storyboardID: String { get }
 }
 
-public protocol AmberController: class, AmberPresenter, AmberPresentable {
+public protocol AmberController: AmberPresenter, AmberPresentable {
     associatedtype Reducer: AmberReducer
     
     var store: AmberStore<Reducer> { get }
