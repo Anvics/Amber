@@ -14,6 +14,8 @@ enum AmberPresentationType{
 
 public protocol AmberEmbedder {
     func embed<Module: AmberController>(_ module: Module.Type, data: Module.Reducer.State.RequiredData, inView view: UIView, outputListener: Module.OutputActionListener?) -> Module.InputActionListener
+    func cleanEmbed<Module: AmberController>(_ module: Module.Type, data: Module.Reducer.State.RequiredData, inView view: UIView, outputListener: Module.OutputActionListener?) -> Module.InputActionListener
+    func embedFullScreen<Module: AmberController>(_ module: Module.Type, data: Module.Reducer.State.RequiredData, outputListener: Module.OutputActionListener?) -> Module.InputActionListener
 }
 
 public extension AmberEmbedder{
@@ -24,6 +26,22 @@ public extension AmberEmbedder{
     func embed<Module: AmberController>(_ module: Module.Type, inView view: UIView, outputListener: Module.OutputActionListener? = nil) -> Module.InputActionListener where Module.Reducer.State.RequiredData == Void {
         return embed(module, data: (), inView: view, outputListener: outputListener)
     }
+    
+    func cleanEmbed<Module: AmberController>(_ module: Module.Type, data: Module.Reducer.State.RequiredData, inView view: UIView) -> Module.InputActionListener{
+        return cleanEmbed(module, data: data, inView: view, outputListener: nil)
+    }
+    
+    func cleanEmbed<Module: AmberController>(_ module: Module.Type, inView view: UIView, outputListener: Module.OutputActionListener?) -> Module.InputActionListener where Module.Reducer.State.RequiredData == Void {
+        return cleanEmbed(module, data: (), inView: view, outputListener: outputListener)
+    }
+    
+    func embedFullScreen<Module: AmberController>(_ module: Module.Type, data: Module.Reducer.State.RequiredData, inView view: UIView) -> Module.InputActionListener{
+        return embedFullScreen(module, data: data, outputListener: nil)
+    }
+    
+    func embedFullScreen<Module: AmberController>(_ module: Module.Type, outputListener: Module.OutputActionListener?) -> Module.InputActionListener where Module.Reducer.State.RequiredData == Void {
+        return embedFullScreen(module, data: (), outputListener: outputListener)
+    }
 }
 
 public protocol AmberRoutePerformer: AmberEmbedder {
@@ -32,10 +50,12 @@ public protocol AmberRoutePerformer: AmberEmbedder {
     func present<Module: AmberController>(_ module: Module.Type, data: Module.Reducer.State.RequiredData, outputListener: Module.OutputActionListener?) -> Module.InputActionListener
 
     func baseReplace(storyboardFile: String, storyboardID: String, animation: UIViewAnimationOptions)
-
     func baseShow(storyboardFile: String, storyboardID: String)
-
     func basePresent(storyboardFile: String, storyboardID: String)
+
+    func baseReplace(controller: UIViewController, animation: UIViewAnimationOptions)
+    func baseShow(controller: UIViewController)
+    func basePresent(controller: UIViewController)
 
     func close()
 
@@ -68,20 +88,29 @@ public extension AmberRoutePerformer{
     func present<Module: AmberController>(_ module: Module.Type, outputListener: Module.OutputActionListener? = nil) -> Module.InputActionListener where Module.Reducer.State.RequiredData == Void{
         return present(module, data: (), outputListener: outputListener)
     }
+    
+    func present<Module: AmberController>(_ module: Module.Type, data: Module.Reducer.State.RequiredData) -> Module.InputActionListener{
+        return present(module, data: data, outputListener: nil)
+    }
 }
 
 public class FakeAmberRoutePerformer: AmberRoutePerformer{
     public func embed<Module: AmberController>(_ module: Module.Type, data: Module.Reducer.State.RequiredData, inView view: UIView, outputListener: Module.OutputActionListener?) -> Module.InputActionListener{ return { _ in } }
+    public func cleanEmbed<Module: AmberController>(_ module: Module.Type, data: Module.Reducer.State.RequiredData, inView view: UIView, outputListener: Module.OutputActionListener?) -> Module.InputActionListener{ return { _ in } }
+    public func embedFullScreen<Module: AmberController>(_ module: Module.Type, data: Module.Reducer.State.RequiredData, outputListener: Module.OutputActionListener?) -> Module.InputActionListener{ return { _ in } }
+    
     public func replace<Module: AmberController>(with module: Module.Type, data: Module.Reducer.State.RequiredData, animation: UIViewAnimationOptions){ }
 
     public func show<Module: AmberController>(_ module: Module.Type, data: Module.Reducer.State.RequiredData, outputListener: Module.OutputActionListener?) -> Module.InputActionListener{ return { _ in } }
     public func present<Module: AmberController>(_ module: Module.Type, data: Module.Reducer.State.RequiredData, outputListener: Module.OutputActionListener?) -> Module.InputActionListener{ return { _ in } }
 
     public func baseReplace(storyboardFile: String, storyboardID: String, animation: UIViewAnimationOptions){ }
-
     public func baseShow(storyboardFile: String, storyboardID: String){ }
-
     public func basePresent(storyboardFile: String, storyboardID: String){ }
+    
+    public func baseReplace(controller: UIViewController, animation: UIViewAnimationOptions){ }
+    public func baseShow(controller: UIViewController){ }
+    public func basePresent(controller: UIViewController){ }
 
     public func close(){ }
 
@@ -126,6 +155,16 @@ final class AmberRoutePerformerImplementation<T: AmberController, U: AmberContro
         let vc = createController(storyboardFile: storyboardFile, storyboardID: storyboardID)
         controller?.present(vc, animated: true, completion: nil)
     }
+    
+    func baseReplace(controller: UIViewController, animation: UIViewAnimationOptions){
+        replaceWith(controller, animation: animation)
+    }
+    func baseShow(controller: UIViewController){
+        self.controller?.show(controller, animated: true)
+    }
+    func basePresent(controller: UIViewController){
+        self.controller?.present(controller, animated: true, completion: nil)
+    }
 
     func close() { controller?.close(animated: true) }
 
@@ -137,9 +176,20 @@ final class AmberRoutePerformerImplementation<T: AmberController, U: AmberContro
 
     func embed<Module: AmberController>(_ module: Module.Type, data: Module.Reducer.State.RequiredData, inView view: UIView, outputListener: Module.OutputActionListener?) -> Module.InputActionListener{
         let (vc, output) = AmberControllerHelper.create(module: module, data: data, route: controller!, outputListener: outputListener)
-        guard let uicontroller = controller as? UIViewController else { fatalError() }
+        guard let uicontroller = embedder as? UIViewController else { fatalError() }
         vc.embedIn(view: view, container: uicontroller)
         return output
+    }
+        
+    func cleanEmbed<Module: AmberController>(_ module: Module.Type, data: Module.Reducer.State.RequiredData, inView view: UIView, outputListener: Module.OutputActionListener?) -> Module.InputActionListener{
+        view.embeddedControllers.forEach { $0.unembed(shouldModifyEmbedArray: false) }
+        view.embeddedControllers = []
+        return embed(module, data: data, inView: view, outputListener: outputListener)
+    }
+    
+    func embedFullScreen<Module: AmberController>(_ module: Module.Type, data: Module.Reducer.State.RequiredData, outputListener: Module.OutputActionListener?) -> Module.InputActionListener{
+        guard let uicontroller = embedder as? UIViewController else { fatalError() }
+        return embed(module, data: data, inView: uicontroller.view, outputListener: outputListener)
     }
 
     private func replaceWith(_ vc: UIViewController, animation: UIViewAnimationOptions){

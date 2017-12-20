@@ -25,6 +25,7 @@ extension UIViewController: AmberPresenter{
         self.view.frame = view.bounds
         container.addChildViewController(self)
         view.addSubview(self.view)
+        view.embeddedControllers.append(self)
         didMove(toParentViewController: container)
     }
     
@@ -51,9 +52,24 @@ extension UIViewController: AmberPresenter{
         navigationController?.popToRootViewController(animated: animated)
     }
     
-    private func unembed(){
+    func unembed(shouldModifyEmbedArray: Bool = true){
         removeFromParentViewController()
+        if let index = view.superview?.embeddedControllers.index(of: self), shouldModifyEmbedArray{
+            view.superview?.embeddedControllers.remove(at: index)
+        }
         view.removeFromSuperview()
         didMove(toParentViewController: nil)
+    }
+}
+
+private var UIView_Associated_EmbedControllers: UInt8 = 0
+extension UIView{
+    var embeddedControllers: [UIViewController]{
+        get {
+            return objc_getAssociatedObject(self, &UIView_Associated_EmbedControllers) as? [UIViewController] ?? []
+        }
+        set {
+            objc_setAssociatedObject(self, &UIView_Associated_EmbedControllers, newValue, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+        }
     }
 }

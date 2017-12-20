@@ -42,11 +42,25 @@ public extension AmberController{
         store.initialize(with: data, routePerformer: AmberRoutePerformerImplementation(controller: self, embedder: self))
     }
     
+    public func perform(action: Reducer.Action){
+        store.perform(action: action)
+    }
+    
+    public func perform(transitions: Reducer.Transition...){
+        transitions.forEach(store.perform)
+    }
+    
+    public func perform(outputAction: Reducer.OutputAction){
+        store.performOutput(action: outputAction)
+    }
+    
     public var action: Subject<Reducer.Action, NoError> { return store.action }
     public var outputAction: Subject<Reducer.OutputAction, NoError> { return store.outputAction }
     public var transition: Subject<Reducer.Transition, NoError> { return store.transition }
     
     public var state: Signal<Reducer.State, NoError> { return store.state }
+    
+    public var currentState: Reducer.State { return store.currentState() }
 }
 
 public extension AmberController where Reducer.State.RequiredData == Void{
