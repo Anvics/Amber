@@ -9,7 +9,7 @@
 import UIKit
 
 enum AmberPresentationType{
-    case present, show, embed
+    case present, show
 }
 
 public protocol AmberEmbedder {
@@ -209,7 +209,6 @@ final class AmberRoutePerformerImplementation<T: AmberController, U: AmberContro
         switch presentation {
         case .present: controller?.present(vc, animated: true, completion: nil)
         case .show: controller?.show(vc, animated: true)
-        case .embed: fatalError("Call embed instead of route")
         }
         return output
     }
@@ -219,8 +218,8 @@ final class AmberRoutePerformerImplementation<T: AmberController, U: AmberContro
 public protocol AmberRouter{
     associatedtype Reducer: AmberReducer
 
-    func perform(transition: Reducer.Transition, route: AmberRoutePerformer, reducer: Reducer, performAction: @escaping (Reducer.Action) -> Void)
+    func perform(transition: Reducer.Transition, on state: Reducer.State, isCancelled: Bool, route: AmberRoutePerformer, reducer: Reducer, performAction: @escaping (Reducer.Action) -> Void)
 }
 
-typealias AmberRouterBlock<Reducer: AmberReducer> = (Reducer.Transition, AmberRoutePerformer, Reducer, @escaping (Reducer.Action) -> Void) -> Void
+typealias AmberRouterBlock<Reducer: AmberReducer> = (Reducer.Transition, Reducer.State, Bool, AmberRoutePerformer, Reducer, @escaping (Reducer.Action) -> Void) -> Void
 

@@ -54,6 +54,10 @@ public extension AmberController{
         store.performOutput(action: outputAction)
     }
     
+    public func field<T: Equatable>(extract: @escaping (Reducer.State) -> T) -> Signal<T, NoError>{
+        return state.map(extract).distinct()
+    }
+    
     public var action: Subject<Reducer.Action, NoError> { return store.action }
     public var outputAction: Subject<Reducer.OutputAction, NoError> { return store.outputAction }
     public var transition: Subject<Reducer.Transition, NoError> { return store.transition }

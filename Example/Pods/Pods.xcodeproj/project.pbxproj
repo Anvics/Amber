@@ -17,6 +17,10 @@
 		1661B59AB8AE1C08BF1EC1B021407C8E /* QueryableDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92D791BE4F2C6180FDC060A9FCC5B02B /* QueryableDataSource.swift */; };
 		1A959283DC55471FF200BBA318902672 /* UIButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CDC2E49E64C4631A3A959611E586B1B /* UIButton.swift */; };
 		1C99394C665C75445442D230B22DDDB1 /* UIDatePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = D17F1608D6FC5DD94F13BFC9C2F2180A /* UIDatePicker.swift */; };
+		1E17E90720D14C1400FFBB25 /* AmberLoggingMiddleware.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E17E90520D14C1400FFBB25 /* AmberLoggingMiddleware.swift */; };
+		1E17E90820D14C1400FFBB25 /* AmberDelayMiddleware.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E17E90620D14C1400FFBB25 /* AmberDelayMiddleware.swift */; };
+		1E17E90B20D14C2800FFBB25 /* AmberAppStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E17E90920D14C2800FFBB25 /* AmberAppStore.swift */; };
+		1E17E90C20D14C2800FFBB25 /* AmberAppReducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E17E90A20D14C2800FFBB25 /* AmberAppReducer.swift */; };
 		1F45E13341E2F54C3DCAB28ED5C7398C /* GenericPatch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BA73A57251224E907E3B3CCD4DB570C /* GenericPatch.swift */; };
 		20C1B3D95CF5B95D88A1F41F2BEE95CA /* Observable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 683624C6F5D6C7E95C8CA6451C1445D4 /* Observable.swift */; };
 		22D85F4D4F44C311FB509076B33E97A3 /* Result.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72EEEEE3EFC569771278F5DA07FE8D45 /* Result.swift */; };
@@ -197,6 +201,10 @@
 		15CBB34683FF25C514DBFF4B6BAED7EF /* Diff+UIKit.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = "Diff+UIKit.swift"; path = "Sources/Differ/Diff+UIKit.swift"; sourceTree = "<group>"; };
 		19277A620A04C090DD5A298732D511FB /* Bond.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Bond.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		19DB24DE20682376C7B0FB5EE52F04C4 /* Property.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Property.swift; path = Sources/Property.swift; sourceTree = "<group>"; };
+		1E17E90520D14C1400FFBB25 /* AmberLoggingMiddleware.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AmberLoggingMiddleware.swift; path = Amber/Classes/AmberLoggingMiddleware.swift; sourceTree = "<group>"; };
+		1E17E90620D14C1400FFBB25 /* AmberDelayMiddleware.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AmberDelayMiddleware.swift; path = Amber/Classes/AmberDelayMiddleware.swift; sourceTree = "<group>"; };
+		1E17E90920D14C2800FFBB25 /* AmberAppStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AmberAppStore.swift; path = Amber/Classes/AmberAppStore.swift; sourceTree = "<group>"; };
+		1E17E90A20D14C2800FFBB25 /* AmberAppReducer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AmberAppReducer.swift; path = Amber/Classes/AmberAppReducer.swift; sourceTree = "<group>"; };
 		1EAB8A20B25DFA0AA6BE0B34AEBEAB55 /* Signal.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Signal.swift; path = Sources/Signal.swift; sourceTree = "<group>"; };
 		1FB544EA198EBFE828A163174D7EE9B0 /* Differ-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Differ-prefix.pch"; sourceTree = "<group>"; };
 		1FF3843E16E07E3AFEA13E920083593E /* UITextField.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = UITextField.swift; path = Sources/Bond/UIKit/UITextField.swift; sourceTree = "<group>"; };
@@ -382,6 +390,10 @@
 				478DC0C2CF86BA8E0D89F1149B6B9C22 /* AmberReducer.swift */,
 				ABF74DAF6F72644FB32874A4BE925E4B /* AmberRouter.swift */,
 				6CEBE29EB7ADFB90CCBE0E19EFDD432A /* AmberStore.swift */,
+				1E17E90A20D14C2800FFBB25 /* AmberAppReducer.swift */,
+				1E17E90920D14C2800FFBB25 /* AmberAppStore.swift */,
+				1E17E90620D14C1400FFBB25 /* AmberDelayMiddleware.swift */,
+				1E17E90520D14C1400FFBB25 /* AmberLoggingMiddleware.swift */,
 				4398E9626BC01E7D74AB555B30F13010 /* Support Files */,
 			);
 			name = Amber;
@@ -767,7 +779,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 0830;
-				LastUpgradeCheck = 0900;
+				LastUpgradeCheck = 0940;
 				TargetAttributes = {
 					F7DEA6B8F918349B4017316F3116254F = {
 						LastSwiftMigration = "";
@@ -906,12 +918,16 @@
 			files = (
 				FDBDC43BD8D4260D253C2552E4FD5E35 /* Amber-dummy.m in Sources */,
 				B4F4611C7A50FFF641DADE8F9CC24660 /* Amber.swift in Sources */,
+				1E17E90B20D14C2800FFBB25 /* AmberAppStore.swift in Sources */,
 				83312C979BFFDB7714D8A4ECE083AFFC /* AmberController+UI.swift in Sources */,
 				26B689BBDD322BA94C0E03E95489C48A /* AmberController.swift in Sources */,
 				68BDE2270213522C6DFE852A5EA2C4C9 /* AmberMiddleware.swift in Sources */,
+				1E17E90C20D14C2800FFBB25 /* AmberAppReducer.swift in Sources */,
+				1E17E90820D14C1400FFBB25 /* AmberDelayMiddleware.swift in Sources */,
 				6160DC9288B9410D216657348B658877 /* AmberReducer.swift in Sources */,
 				2EC3AA1C887EC357A73C42123AFC32A4 /* AmberRouter.swift in Sources */,
 				5BDBBEBA3F4DEE443A7F0582D8E5688B /* AmberStore.swift in Sources */,
+				1E17E90720D14C1400FFBB25 /* AmberLoggingMiddleware.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -989,6 +1005,7 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
@@ -996,6 +1013,7 @@
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
@@ -1398,6 +1416,7 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
@@ -1405,6 +1424,7 @@
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;

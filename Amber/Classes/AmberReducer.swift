@@ -22,9 +22,9 @@ public protocol AmberReducer{
     
     func initialize(state: State, performAction: @escaping ActionBlock, performOutputAction: @escaping OutputActionListener)
     
-    func reduce(action: Action, state: State, performTransition: @escaping TransitionBlock, performAction: @escaping ActionBlock, performOutputAction: @escaping OutputActionListener) -> State
+    func reduce(action: Action, state: State, isCancelled: Bool, performTransition: @escaping TransitionBlock, performAction: @escaping ActionBlock, performOutputAction: @escaping OutputActionListener) -> State
     
-    func reduceInput(action: InputAction, state: State, performAction: @escaping ActionBlock, performOutputAction: @escaping OutputActionListener) -> State
+    func reduceInput(action: InputAction, state: State, isCancelled: Bool, performAction: @escaping ActionBlock, performOutputAction: @escaping OutputActionListener) -> State
 }
 
 public extension AmberReducer{

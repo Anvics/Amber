@@ -73,3 +73,26 @@ extension UIView{
         }
     }
 }
+
+public class AmberControllerHelper{
+    public static func create<Module: AmberController>(module: Module.Type, data: Module.Reducer.State.RequiredData, outputListener: Module.OutputActionListener? = nil) -> (UIViewController, Module.InputActionListener){
+        return create(module: module, data: data, outputListener: outputListener, router: { $0 })
+    }
+    
+    public static func create<Module: AmberController, Route: AmberController>(module: Module.Type, data: Module.Reducer.State.RequiredData, route: Route, outputListener: Module.OutputActionListener? = nil) -> (UIViewController, Module.InputActionListener){
+        return create(module: module, data: data, outputListener: outputListener, router: { _ in route })
+    }
+    
+    private static func create<Module: AmberController, Route: AmberController>(module: Module.Type, data: Module.Reducer.State.RequiredData, outputListener: Module.OutputActionListener? = nil, router: (Module) -> Route) -> (UIViewController, Module.InputActionListener){
+        
+        let vc = Module.instantiate()
+        vc.store.initialize(with: data, routePerformer: AmberRoutePerformerImplementation(controller: router(vc), embedder: vc))
+        vc.store.outputListener = outputListener
+        
+        guard let uivc = vc as? UIViewController else {
+            fatalError("На текущий момент возможно произвести переход/встроить только UIViewController. Попытались создать \(type(of: vc))")
+        }
+        
+        return (uivc, vc.store.performInput)
+    }
+}

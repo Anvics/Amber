@@ -20,9 +20,17 @@ public extension AmberState where RequiredData == Void{
     }
 }
 
-public protocol AmberTransition { }
+public protocol AmberCancellable{
+    var shouldProcessIfCancelled: Bool { get }
+}
 
-public protocol AmberAction { }
+extension AmberCancellable{
+    var shouldProcessIfCancelled: Bool { return false }
+}
+
+public protocol AmberTransition: AmberCancellable { }
+
+public protocol AmberAction: AmberCancellable { }
 
 public enum AmberEither<A, B>{
     case first(A)
@@ -30,29 +38,33 @@ public enum AmberEither<A, B>{
 }
 
 public class Amber{
-    public static let main = Amber()
+    private(set) static var middleware: [AmberMiddleware] = []
+    static var appStore: AmberAppStoreBase?
     
-    private(set) var middleware: [AmberMiddleware] = []
-    
-    public func registerSharedMiddleware(_ sharedMiddleware: AmberMiddleware...){
-        for m in sharedMiddleware{
-            middleware.append(m)
-        }
-    }
-    
-    func process(state: Any, beforeEvent event: Any){
+    static func process(state: Any, beforeEvent event: Any){
         middleware.forEach { $0.process(state: state, beforeEvent: event) }
     }
     
-    func perform(event: Any, onState state: Any, route: AmberRoutePerformer, index: Int = 0, completion: @escaping () -> ()){
-        if index == middleware.count { completion(); return }
-        middleware[index].perform(event: event, onState: state, route: route) {
+    ///completion(isCancelled: Bool)
+    static func perform(event: Any, onState state: Any, route: AmberRoutePerformer, index: Int = 0, completion: @escaping (Bool) -> ()){
+        if index == middleware.count { completion(false); return }
+        middleware[index].perform(event: event, onState: state, route: route, completeEvent: {
             self.perform(event: event, onState: state, route: route, index: index + 1, completion: completion)
-        }
+        }, cancelEvent: {
+            completion(true)
+        })
     }
     
-    func process(state: Any, afterEvent event: Any, route: AmberRoutePerformer){
+    static func process(state: Any, afterEvent event: Any, route: AmberRoutePerformer){
         middleware.forEach { $0.process(state: state, afterEvent: event, route: route) }
+    }
+    
+    public static func addMiddleware(_ middleware: AmberMiddleware...){
+        self.middleware.append(contentsOf: middleware)
+    }
+    
+    public static func setAppStore(_ store: AmberAppStoreBase){
+        appStore = store
     }
     
     public static func setInitial<Module: AmberController>(module: Module.Type, data: Module.Reducer.State.RequiredData, window: UIWindow!){
