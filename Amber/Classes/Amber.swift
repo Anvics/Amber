@@ -24,7 +24,7 @@ public protocol AmberCancellable{
     var shouldProcessIfCancelled: Bool { get }
 }
 
-extension AmberCancellable{
+public extension AmberCancellable{
     var shouldProcessIfCancelled: Bool { return false }
 }
 
