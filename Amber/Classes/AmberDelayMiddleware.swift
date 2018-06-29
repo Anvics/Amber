@@ -13,6 +13,8 @@ public protocol AmberDelayable{
 }
 
 public class AmberDelayMiddleware: AmberMiddleware{
+    public init(){}
+    
     public func perform(event: Any, onState state: Any, route: AmberRoutePerformer, completeEvent: @escaping () -> (), cancelEvent: @escaping () -> ()){
         guard let delayable = event as? AmberDelayable, let seconds = delayable.delaySeconds else { completeEvent(); return }
         let delayTime = DispatchTime.now() + Double(Int64(seconds * Double(NSEC_PER_SEC))) / Double(NSEC_PER_SEC)

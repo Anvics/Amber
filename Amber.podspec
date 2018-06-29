@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'Amber'
-  s.version          = '2.0.1'
+  s.version          = '2.0.2'
   s.summary          = 'flexible and convenient iOS architecture based on Flex & Elm'
 
 # This description is used to generate tags and improve search results.
