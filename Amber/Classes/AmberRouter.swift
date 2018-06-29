@@ -45,6 +45,8 @@ public extension AmberEmbedder{
 }
 
 public protocol AmberRoutePerformer: AmberEmbedder {
+    var controller: UIViewController? { get }
+    
     func replace<Module: AmberController>(with module: Module.Type, data: Module.Reducer.State.RequiredData, animation: UIViewAnimationOptions)
     func show<Module: AmberController>(_ module: Module.Type, data: Module.Reducer.State.RequiredData, outputListener: Module.OutputActionListener?) -> Module.InputActionListener
     func present<Module: AmberController>(_ module: Module.Type, data: Module.Reducer.State.RequiredData, outputListener: Module.OutputActionListener?) -> Module.InputActionListener
@@ -95,6 +97,8 @@ public extension AmberRoutePerformer{
 }
 
 public class FakeAmberRoutePerformer: AmberRoutePerformer{
+    public var controller: UIViewController? { return nil }
+        
     public func embed<Module: AmberController>(_ module: Module.Type, data: Module.Reducer.State.RequiredData, inView view: UIView, outputListener: Module.OutputActionListener?) -> Module.InputActionListener{ return { _ in } }
     public func cleanEmbed<Module: AmberController>(_ module: Module.Type, data: Module.Reducer.State.RequiredData, inView view: UIView, outputListener: Module.OutputActionListener?) -> Module.InputActionListener{ return { _ in } }
     public func embedFullScreen<Module: AmberController>(_ module: Module.Type, data: Module.Reducer.State.RequiredData, outputListener: Module.OutputActionListener?) -> Module.InputActionListener{ return { _ in } }
@@ -120,11 +124,13 @@ public class FakeAmberRoutePerformer: AmberRoutePerformer{
 }
 
 final class AmberRoutePerformerImplementation<T: AmberController, U: AmberController>: AmberRoutePerformer {
-    weak var controller: T?
+    var controller: UIViewController? { return amberController as? UIViewController }
+    
+    weak var amberController: T?
     weak var embedder: U?
 
     init(controller: T, embedder: U) {
-        self.controller = controller
+        self.amberController = controller
         self.embedder = embedder
     }
 
@@ -148,34 +154,34 @@ final class AmberRoutePerformerImplementation<T: AmberController, U: AmberContro
 
     func baseShow(storyboardFile: String, storyboardID: String){
         let vc = createController(storyboardFile: storyboardFile, storyboardID: storyboardID)
-        controller?.show(vc, animated: true)
+        amberController?.show(vc, animated: true)
     }
 
     func basePresent(storyboardFile: String, storyboardID: String){
         let vc = createController(storyboardFile: storyboardFile, storyboardID: storyboardID)
-        controller?.present(vc, animated: true, completion: nil)
+        amberController?.present(vc, animated: true, completion: nil)
     }
     
     func baseReplace(controller: UIViewController, animation: UIViewAnimationOptions){
         replaceWith(controller, animation: animation)
     }
     func baseShow(controller: UIViewController){
-        self.controller?.show(controller, animated: true)
+        self.amberController?.show(controller, animated: true)
     }
     func basePresent(controller: UIViewController){
-        self.controller?.present(controller, animated: true, completion: nil)
+        self.amberController?.present(controller, animated: true, completion: nil)
     }
 
-    func close() { controller?.close(animated: true) }
+    func close() { amberController?.close(animated: true) }
 
-    func dismiss(){ controller?.dismiss(animated: true) }
+    func dismiss(){ amberController?.dismiss(animated: true) }
 
-    func pop() { controller?.pop(animated: true) }
+    func pop() { amberController?.pop(animated: true) }
 
-    func popToRoot() { controller?.popToRoot(animated: true) }
+    func popToRoot() { amberController?.popToRoot(animated: true) }
 
     func embed<Module: AmberController>(_ module: Module.Type, data: Module.Reducer.State.RequiredData, inView view: UIView, outputListener: Module.OutputActionListener?) -> Module.InputActionListener{
-        let (vc, output) = AmberControllerHelper.create(module: module, data: data, route: controller!, outputListener: outputListener)
+        let (vc, output) = AmberControllerHelper.create(module: module, data: data, route: amberController!, outputListener: outputListener)
         guard let uicontroller = embedder as? UIViewController else { fatalError() }
         vc.embedIn(view: view, container: uicontroller)
         return output
@@ -207,8 +213,8 @@ final class AmberRoutePerformerImplementation<T: AmberController, U: AmberContro
         let (vc, output) = AmberControllerHelper.create(module: module, data: data, outputListener: outputListener)
 
         switch presentation {
-        case .present: controller?.present(vc, animated: true, completion: nil)
-        case .show: controller?.show(vc, animated: true)
+        case .present: amberController?.present(vc, animated: true, completion: nil)
+        case .show: amberController?.show(vc, animated: true)
         }
         return output
     }
