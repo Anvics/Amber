@@ -1,7 +1,7 @@
 ![](Assets/amberLogo2.png)
 # Amber
 
-![](https://img.shields.io/badge/Swift-4.0-orange.svg)
+![](https://img.shields.io/badge/Swift-4.2-orange.svg)
 [![Version](https://img.shields.io/cocoapods/v/Amber.svg?style=flat)](http://cocoapods.org/pods/Amber)
 [![License](https://img.shields.io/cocoapods/l/Amber.svg?style=flat)](http://cocoapods.org/pods/Amber)
 [![Platform](https://img.shields.io/cocoapods/p/Amber.svg?style=flat)](http://cocoapods.org/pods/Amber)

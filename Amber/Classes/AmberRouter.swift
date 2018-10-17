@@ -8,6 +8,12 @@
 
 import UIKit
 
+#if swift(>=4.2)
+    public typealias AnimationOptions = UIView.AnimationOptions
+#else
+    public typealias AnimationOptions = UIViewAnimationOptions
+#endif
+
 enum AmberPresentationType{
     case present, show, embed
 }
@@ -27,11 +33,11 @@ public extension AmberEmbedder{
 }
 
 public protocol AmberRoutePerformer: AmberEmbedder {
-    func replace<Module: AmberController>(with module: Module.Type, data: Module.Reducer.State.RequiredData, animation: UIViewAnimationOptions)
+    func replace<Module: AmberController>(with module: Module.Type, data: Module.Reducer.State.RequiredData, animation: AnimationOptions)
     func show<Module: AmberController>(_ module: Module.Type, data: Module.Reducer.State.RequiredData, outputListener: Module.OutputActionListener?) -> Module.InputActionListener
     func present<Module: AmberController>(_ module: Module.Type, data: Module.Reducer.State.RequiredData, outputListener: Module.OutputActionListener?) -> Module.InputActionListener
 
-    func baseReplace(storyboardFile: String, storyboardID: String, animation: UIViewAnimationOptions)
+    func baseReplace(storyboardFile: String, storyboardID: String, animation: AnimationOptions)
 
     func baseShow(storyboardFile: String, storyboardID: String)
 
@@ -45,7 +51,7 @@ public protocol AmberRoutePerformer: AmberEmbedder {
 }
 
 public extension AmberRoutePerformer{
-    func replace<Module: AmberController>(with module: Module.Type, animation: UIViewAnimationOptions = .transitionCrossDissolve) where Module.Reducer.State.RequiredData == Void{
+    func replace<Module: AmberController>(with module: Module.Type, animation: AnimationOptions = .transitionCrossDissolve) where Module.Reducer.State.RequiredData == Void{
         replace(with: module, data: (), animation: animation)
     }
 
@@ -72,12 +78,12 @@ public extension AmberRoutePerformer{
 
 public class FakeAmberRoutePerformer: AmberRoutePerformer{
     public func embed<Module: AmberController>(_ module: Module.Type, data: Module.Reducer.State.RequiredData, inView view: UIView, outputListener: Module.OutputActionListener?) -> Module.InputActionListener{ return { _ in } }
-    public func replace<Module: AmberController>(with module: Module.Type, data: Module.Reducer.State.RequiredData, animation: UIViewAnimationOptions){ }
+    public func replace<Module: AmberController>(with module: Module.Type, data: Module.Reducer.State.RequiredData, animation: AnimationOptions){ }
 
     public func show<Module: AmberController>(_ module: Module.Type, data: Module.Reducer.State.RequiredData, outputListener: Module.OutputActionListener?) -> Module.InputActionListener{ return { _ in } }
     public func present<Module: AmberController>(_ module: Module.Type, data: Module.Reducer.State.RequiredData, outputListener: Module.OutputActionListener?) -> Module.InputActionListener{ return { _ in } }
 
-    public func baseReplace(storyboardFile: String, storyboardID: String, animation: UIViewAnimationOptions){ }
+    public func baseReplace(storyboardFile: String, storyboardID: String, animation: AnimationOptions){ }
 
     public func baseShow(storyboardFile: String, storyboardID: String){ }
 
@@ -99,7 +105,7 @@ final class AmberRoutePerformerImplementation<T: AmberController, U: AmberContro
         self.embedder = embedder
     }
 
-    func replace<Module: AmberController>(with module: Module.Type, data: Module.Reducer.State.RequiredData, animation: UIViewAnimationOptions){
+    func replace<Module: AmberController>(with module: Module.Type, data: Module.Reducer.State.RequiredData, animation: AnimationOptions){
         let (vc, _) = AmberControllerHelper.create(module: module, data: data, outputListener: nil)
         replaceWith(vc, animation: animation)
     }
@@ -112,7 +118,7 @@ final class AmberRoutePerformerImplementation<T: AmberController, U: AmberContro
         return route(module: module, data: data, presentation: .present, outputListener: outputListener)
     }
 
-    func baseReplace(storyboardFile: String, storyboardID: String, animation: UIViewAnimationOptions){
+    func baseReplace(storyboardFile: String, storyboardID: String, animation: AnimationOptions){
         let vc = createController(storyboardFile: storyboardFile, storyboardID: storyboardID)
         replaceWith(vc, animation: animation)
     }
@@ -142,7 +148,7 @@ final class AmberRoutePerformerImplementation<T: AmberController, U: AmberContro
         return output
     }
 
-    private func replaceWith(_ vc: UIViewController, animation: UIViewAnimationOptions){
+    private func replaceWith(_ vc: UIViewController, animation: AnimationOptions){
         guard let currentVC = UIApplication.shared.keyWindow?.rootViewController else { fatalError() }
         UIView.transition(from: currentVC.view, to: vc.view, duration: 0.4, options: animation) { _ in
             UIApplication.shared.keyWindow?.rootViewController = vc
