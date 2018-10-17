@@ -91,6 +91,7 @@ private extension BNDInvocation {
       let pointer = UnsafeMutablePointer<U>.allocate(capacity: 1)
       pointer.initialize(to: value as! U, count: 1)
       setReturnValue(pointer)
+      pointer.deinitialize()
       pointer.deallocate(capacity: 1)
     }
 
@@ -160,6 +161,7 @@ public class ProtocolProxy: BNDProtocolProxyBase {
 
   public override func handle(_ invocation: BNDInvocation) {
     guard let invoker = invokers[invocation.selector] else { return }
+    invocation.retainArguments()
     invoker(invocation)
   }
 
