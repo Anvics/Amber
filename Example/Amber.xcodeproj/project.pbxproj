@@ -110,7 +110,6 @@
 				607FACE21AFB9204008FA782 /* Frameworks */,
 				607FACE31AFB9204008FA782 /* Resources */,
 				91DAB7A60DF26B8DCC2DB787 /* [CP] Embed Pods Frameworks */,
-				15A1DFCEB9A0CA4638DAEC51 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -167,21 +166,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		15A1DFCEB9A0CA4638DAEC51 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Copy Pods Resources";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Amber_Tests/Pods-Amber_Tests-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
 		91DAB7A60DF26B8DCC2DB787 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;

@@ -45,7 +45,6 @@ public class Amber{
         middleware.forEach { $0.process(state: state, beforeEvent: event) }
     }
     
-    ///completion(isCancelled: Bool)
     static func perform(event: Any, onState state: Any, route: AmberRoutePerformer, index: Int = 0, completion: @escaping (Bool) -> ()){
         if index == middleware.count { completion(false); return }
         middleware[index].perform(event: event, onState: state, route: route, completeEvent: {

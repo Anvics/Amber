@@ -1,7 +1,7 @@
 //
 //  The MIT License (MIT)
 //
-//  Copyright (c) 2016 Srdan Rasic (@srdanrasic)
+//  Copyright (c) 2018 DeclarativeHub/Bond
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -22,24 +22,9 @@
 //  THE SOFTWARE.
 //
 
-import ReactiveKit
 import Foundation
 
-extension Property {
+public protocol Instantiatable {
 
-  /// Transform the `getter` and `setter` by applying a `transform` on them.
-  public func bidirectionalMap<U>(to getTransform: @escaping (Element) -> U,
-                                  from setTransform: @escaping (U) -> Element) -> DynamicSubject<U> {
-    return DynamicSubject<U>(
-      target: self,
-      signal: eraseType(),
-      context: .immediate,
-      get: { (property) -> U in
-        return getTransform(property.value)
-    },
-      set: { (propery, value) in
-        propery.value = setTransform(value)
-    }
-    )
-  }
+    init()
 }

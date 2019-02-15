@@ -1,7 +1,7 @@
 //
 //  The MIT License (MIT)
 //
-//  Copyright (c) 2017 Tony Arnold (@tonyarnold)
+//  Copyright (c) 2016 Srdan Rasic (@srdanrasic)
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -22,15 +22,33 @@
 //  THE SOFTWARE.
 //
 
-public protocol QueryableDataSourceProtocol: DataSourceProtocol {
-  associatedtype Item
-  associatedtype Index
-  func item(at index: Index) -> Item
+#if os(iOS) || os(tvOS)
+
+import UIKit
+import ReactiveKit
+
+public extension ReactiveExtensions where Base: UISearchBar {
+
+    public var delegate: ProtocolProxy {
+        return protocolProxy(for: UISearchBarDelegate.self, keyPath: \.delegate)
+    }
+
+    public var text: DynamicSubject<String?> {
+        let selector = #selector(UISearchBarDelegate.searchBar(_:textDidChange:))
+        let signal = delegate.signal(for: selector) { (subject: SafePublishSubject<Void>, _: UISearchBar, _: NSString) in
+            subject.next()
+        }
+
+        return dynamicSubject(signal: signal, get: { $0.text }, set: { $0.text = $1 })
+    }
 }
 
-extension Array: QueryableDataSourceProtocol {
+extension UISearchBar: BindableProtocol {
 
-  public func item(at index: Int) -> Element {
-    return self[index]
-  }
+    public func bind(signal: Signal<String?, NoError>) -> Disposable {
+        return reactive.text.bind(signal: signal)
+    }
 }
+
+#endif
+

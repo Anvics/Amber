@@ -72,3 +72,32 @@ public extension AmberController where Reducer.State.RequiredData == Void{
         store.initialize(with: (), routePerformer: AmberRoutePerformerImplementation(controller: self, embedder: self))
     }
 }
+
+//For hardcore users
+infix operator ~>
+infix operator *>
+
+public func *><T: AmberController>(left: (T, UIButton), right: T.Reducer.Action){
+    left.1.reactive.tap.replace(with: right).bind(to: left.0.action)
+}
+
+public func *><T: AmberController, R>(left: (T, Signal<R, NoError>), right: T.Reducer.Action){
+    left.1.replace(with: right).bind(to: left.0.action)
+}
+
+public func *><T: AmberController, R>(left: (T, Signal<R, NoError>), right: @escaping (R) -> T.Reducer.Action){
+    left.1.map(right).bind(to: left.0.action)
+}
+
+
+public func ~><T: AmberController>(left: (T, UIButton), right: T.Reducer.Transition){
+    left.1.reactive.tap.replace(with: right).bind(to: left.0.transition)
+}
+
+public func ~><T: AmberController, R>(left: (T, Signal<R, NoError>), right: T.Reducer.Transition){
+    left.1.replace(with: right).bind(to: left.0.transition)
+}
+
+public func ~><T: AmberController, R>(left: (T, Signal<R, NoError>), right: @escaping (R) -> T.Reducer.Transition){
+    left.1.map(right).bind(to: left.0.transition)
+}
