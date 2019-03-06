@@ -1,5 +1,5 @@
 PODS:
-  - Amber (2.1.0):
+  - Amber (2.1.1):
     - Bond (~> 7.2.0)
   - Bond (7.2.1):
     - Differ (~> 1.3)
@@ -22,7 +22,7 @@ EXTERNAL SOURCES:
     :path: "../"
 
 SPEC CHECKSUMS:
-  Amber: f1a86e696558fcee7c16e7cff214eb2dad9a54fb
+  Amber: 18be5d24a8849bee84d0771c58aa69b3dbe62923
   Bond: 663dd8da3eccadb4d7d57243499d387f9976580d
   Differ: 9fcee7602542d7c6484ce05a0faec1c11258ed63
   ReactiveKit: 5f4c440715d671901c382ae6b42ed3337ce4699b

@@ -1,6 +1,6 @@
 {
   "name": "Amber",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "summary": "flexible and convenient iOS architecture based on Flex & Elm",
   "description": "Amber is flexible and convenient iOS architecture based on Flex & Elm.\nIt uses Reducer to process Actions and Router to process Transitions.",
   "homepage": "https://github.com/Anvics/Amber",
@@ -13,7 +13,7 @@
   },
   "source": {
     "git": "https://github.com/Anvics/Amber.git",
-    "tag": "2.1.0"
+    "tag": "2.1.1"
   },
   "platforms": {
     "ios": "9.0"

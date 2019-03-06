@@ -51,7 +51,7 @@ public class Amber{
             self.perform(event: event, onState: state, route: route, index: index + 1, completion: completion)
         }, cancelEvent: {
             completion(true)
-        })
+        })        
     }
     
     static func process(state: Any, afterEvent event: Any, route: AmberRoutePerformer){
