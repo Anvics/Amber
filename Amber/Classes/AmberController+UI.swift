@@ -23,10 +23,10 @@ extension UIViewController: AmberPresenter{
 
     public func embedIn(view: UIView, container: UIViewController){
         self.view.frame = view.bounds
-        container.addChildViewController(self)
+        container.addChild(self)
         view.addSubview(self.view)
         view.embeddedControllers.append(self)
-        didMove(toParentViewController: container)
+        didMove(toParent: container)
     }
     
     public func show(_ viewController: UIViewController, animated: Bool){
@@ -53,12 +53,12 @@ extension UIViewController: AmberPresenter{
     }
     
     func unembed(shouldModifyEmbedArray: Bool = true){
-        removeFromParentViewController()
+        removeFromParent()
         if let index = view.superview?.embeddedControllers.index(of: self), shouldModifyEmbedArray{
             view.superview?.embeddedControllers.remove(at: index)
         }
         view.removeFromSuperview()
-        didMove(toParentViewController: nil)
+        didMove(toParent: nil)
     }
 }
 

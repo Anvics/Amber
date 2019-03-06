@@ -47,15 +47,15 @@ public extension AmberEmbedder{
 public protocol AmberRoutePerformer: AmberEmbedder {
     var controller: UIViewController? { get }
     
-    func replace<Module: AmberController>(with module: Module.Type, data: Module.Reducer.State.RequiredData, animation: UIViewAnimationOptions)
+    func replace<Module: AmberController>(with module: Module.Type, data: Module.Reducer.State.RequiredData, animation: UIView.AnimationOptions)
     func show<Module: AmberController>(_ module: Module.Type, data: Module.Reducer.State.RequiredData, outputListener: Module.OutputActionListener?) -> Module.InputActionListener
     func present<Module: AmberController>(_ module: Module.Type, data: Module.Reducer.State.RequiredData, outputListener: Module.OutputActionListener?) -> Module.InputActionListener
 
-    func baseReplace(storyboardFile: String, storyboardID: String, animation: UIViewAnimationOptions)
+    func baseReplace(storyboardFile: String, storyboardID: String, animation: UIView.AnimationOptions)
     func baseShow(storyboardFile: String, storyboardID: String)
     func basePresent(storyboardFile: String, storyboardID: String)
 
-    func baseReplace(controller: UIViewController, animation: UIViewAnimationOptions)
+    func baseReplace(controller: UIViewController, animation: UIView.AnimationOptions)
     func baseShow(controller: UIViewController)
     func basePresent(controller: UIViewController)
 
@@ -67,7 +67,7 @@ public protocol AmberRoutePerformer: AmberEmbedder {
 }
 
 public extension AmberRoutePerformer{
-    func replace<Module: AmberController>(with module: Module.Type, animation: UIViewAnimationOptions = .transitionCrossDissolve) where Module.Reducer.State.RequiredData == Void{
+    func replace<Module: AmberController>(with module: Module.Type, animation: UIView.AnimationOptions = .transitionCrossDissolve) where Module.Reducer.State.RequiredData == Void{
         replace(with: module, data: (), animation: animation)
     }
 
@@ -103,16 +103,16 @@ public class FakeAmberRoutePerformer: AmberRoutePerformer{
     public func cleanEmbed<Module: AmberController>(_ module: Module.Type, data: Module.Reducer.State.RequiredData, inView view: UIView, outputListener: Module.OutputActionListener?) -> Module.InputActionListener{ return { _ in } }
     public func embedFullScreen<Module: AmberController>(_ module: Module.Type, data: Module.Reducer.State.RequiredData, outputListener: Module.OutputActionListener?) -> Module.InputActionListener{ return { _ in } }
     
-    public func replace<Module: AmberController>(with module: Module.Type, data: Module.Reducer.State.RequiredData, animation: UIViewAnimationOptions){ }
+    public func replace<Module: AmberController>(with module: Module.Type, data: Module.Reducer.State.RequiredData, animation: UIView.AnimationOptions){ }
 
     public func show<Module: AmberController>(_ module: Module.Type, data: Module.Reducer.State.RequiredData, outputListener: Module.OutputActionListener?) -> Module.InputActionListener{ return { _ in } }
     public func present<Module: AmberController>(_ module: Module.Type, data: Module.Reducer.State.RequiredData, outputListener: Module.OutputActionListener?) -> Module.InputActionListener{ return { _ in } }
 
-    public func baseReplace(storyboardFile: String, storyboardID: String, animation: UIViewAnimationOptions){ }
+    public func baseReplace(storyboardFile: String, storyboardID: String, animation: UIView.AnimationOptions){ }
     public func baseShow(storyboardFile: String, storyboardID: String){ }
     public func basePresent(storyboardFile: String, storyboardID: String){ }
     
-    public func baseReplace(controller: UIViewController, animation: UIViewAnimationOptions){ }
+    public func baseReplace(controller: UIViewController, animation: UIView.AnimationOptions){ }
     public func baseShow(controller: UIViewController){ }
     public func basePresent(controller: UIViewController){ }
 
@@ -134,7 +134,7 @@ final class AmberRoutePerformerImplementation<T: AmberController, U: AmberContro
         self.embedder = embedder
     }
 
-    func replace<Module: AmberController>(with module: Module.Type, data: Module.Reducer.State.RequiredData, animation: UIViewAnimationOptions){
+    func replace<Module: AmberController>(with module: Module.Type, data: Module.Reducer.State.RequiredData, animation: UIView.AnimationOptions){
         let (vc, _) = AmberControllerHelper.create(module: module, data: data, outputListener: nil)
         replaceWith(vc, animation: animation)
     }
@@ -147,7 +147,7 @@ final class AmberRoutePerformerImplementation<T: AmberController, U: AmberContro
         return route(module: module, data: data, presentation: .present, outputListener: outputListener)
     }
 
-    func baseReplace(storyboardFile: String, storyboardID: String, animation: UIViewAnimationOptions){
+    func baseReplace(storyboardFile: String, storyboardID: String, animation: UIView.AnimationOptions){
         let vc = createController(storyboardFile: storyboardFile, storyboardID: storyboardID)
         replaceWith(vc, animation: animation)
     }
@@ -162,7 +162,7 @@ final class AmberRoutePerformerImplementation<T: AmberController, U: AmberContro
         amberController?.present(vc, animated: true, completion: nil)
     }
     
-    func baseReplace(controller: UIViewController, animation: UIViewAnimationOptions){
+    func baseReplace(controller: UIViewController, animation: UIView.AnimationOptions){
         replaceWith(controller, animation: animation)
     }
     func baseShow(controller: UIViewController){
@@ -198,7 +198,7 @@ final class AmberRoutePerformerImplementation<T: AmberController, U: AmberContro
         return embed(module, data: data, inView: uicontroller.view, outputListener: outputListener)
     }
 
-    private func replaceWith(_ vc: UIViewController, animation: UIViewAnimationOptions){
+    private func replaceWith(_ vc: UIViewController, animation: UIView.AnimationOptions){
         guard let currentVC = UIApplication.shared.keyWindow?.rootViewController else { fatalError() }
         UIView.transition(from: currentVC.view, to: vc.view, duration: 0.4, options: animation) { _ in
             UIApplication.shared.keyWindow?.rootViewController = vc

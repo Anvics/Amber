@@ -1,7 +1,7 @@
 PODS:
-  - Amber (2.0.4):
-    - Bond (~> 7.1.0)
-  - Bond (7.1.0):
+  - Amber (2.1.0):
+    - Bond (~> 7.2.0)
+  - Bond (7.2.1):
     - Differ (~> 1.3)
     - ReactiveKit (~> 3.9)
   - Differ (1.3.0)
@@ -9,7 +9,7 @@ PODS:
 
 DEPENDENCIES:
   - Amber (from `../`)
-  - Bond (~> 7.1.0)
+  - Bond (~> 7.2.0)
 
 SPEC REPOS:
   https://github.com/CocoaPods/Specs.git:
@@ -22,11 +22,11 @@ EXTERNAL SOURCES:
     :path: "../"
 
 SPEC CHECKSUMS:
-  Amber: 79bed99196e2c01b3221049d5727f3d433fcf69b
-  Bond: 4823d28dcb3b2d5fcc49bc6112f004db1e82fb22
+  Amber: f1a86e696558fcee7c16e7cff214eb2dad9a54fb
+  Bond: 663dd8da3eccadb4d7d57243499d387f9976580d
   Differ: 9fcee7602542d7c6484ce05a0faec1c11258ed63
   ReactiveKit: 5f4c440715d671901c382ae6b42ed3337ce4699b
 
-PODFILE CHECKSUM: f2d276e383abe39b4afa41b79e902ddfac2fab62
+PODFILE CHECKSUM: e5faa8b18a66c660a8d6ca7f1d61cad13a916569
 
 COCOAPODS: 1.5.0

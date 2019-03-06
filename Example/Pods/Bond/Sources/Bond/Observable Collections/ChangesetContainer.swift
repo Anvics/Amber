@@ -23,6 +23,7 @@
 //
 
 import Foundation
+import ReactiveKit
 
 /// A type that contains or wraps a changeset.
 public protocol ChangesetContainerProtocol: class {
@@ -97,7 +98,7 @@ extension MutableChangesetContainerProtocol {
     }
 }
 
-extension ChangesetContainerProtocol where Changeset.Collection: Collection {
+extension ChangesetContainerProtocol where Changeset.Collection: Swift.Collection {
 
     /// Returns `true` if underlying collection is empty, `false` otherwise.
     public var isEmpty: Bool {
@@ -117,7 +118,7 @@ extension ChangesetContainerProtocol where Changeset.Collection: Collection {
     }
 }
 
-extension ChangesetContainerProtocol where Changeset.Collection: Collection, Changeset.Collection.Index == Int {
+extension ChangesetContainerProtocol where Changeset.Collection: Swift.Collection, Changeset.Collection.Index == Int {
 
     /// Underlying array.
     public var array: Collection {
@@ -147,5 +148,14 @@ extension ChangesetContainerProtocol where Changeset.Collection: TreeNodeProtoco
         get {
             return collection[index]
         }
+    }
+}
+
+extension SignalProtocol where Error == NoError {
+
+    /// Bind the collection signal to the given changeset container like MutableObervableArray.
+    @discardableResult
+    public func bind<C: ChangesetContainerProtocol>(to changesetContainer: C) -> Disposable where C: BindableProtocol, C.Element == C.Changeset, C.Changeset.Collection == Element {
+        return map { C.Changeset(collection: $0, diff: .init()) }.bind(to: changesetContainer)
     }
 }
