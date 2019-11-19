@@ -55,16 +55,16 @@ public extension AmberController{
     }
     
     func field<T: Equatable>(_ extract: @escaping (Reducer.State) -> T) -> Signal<T, Never>{
-        return state.map(extract).distinctUntilChanged()
+        return state.map(extract).removeDuplicates()
     }
     
-    public var action: Subject<Reducer.Action, Never> { return store.action }
-    public var outputAction: Subject<Reducer.OutputAction, Never> { return store.outputAction }
-    public var transition: Subject<Reducer.Transition, Never> { return store.transition }
+    var action: Subject<Reducer.Action, Never> { return store.action }
+    var outputAction: Subject<Reducer.OutputAction, Never> { return store.outputAction }
+    var transition: Subject<Reducer.Transition, Never> { return store.transition }
     
-    public var state: Signal<Reducer.State, Never> { return store.state }
+    var state: Signal<Reducer.State, Never> { return store.state }
     
-    public var currentState: Reducer.State { return store.currentState() }
+    var currentState: Reducer.State { return store.currentState() }
 }
 
 public extension AmberController where Reducer.State.RequiredData == Void{
