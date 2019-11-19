@@ -10,11 +10,11 @@ import Foundation
 import ReactiveKit
 
 public final class AmberStore<Reducer: AmberReducer>{
-    var state: Signal<Reducer.State, NoError> { return _state.toSignal().ignoreNil() }
+    var state: Signal<Reducer.State, Never> { return _state.toSignal().ignoreNils() }
     
-    public let action = Subject<Reducer.Action, NoError>()
-    public let outputAction = Subject<Reducer.OutputAction, NoError>()
-    public let transition = Subject<Reducer.Transition, NoError>()
+    public let action = Subject<Reducer.Action, Never>()
+    public let outputAction = Subject<Reducer.OutputAction, Never>()
+    public let transition = Subject<Reducer.Transition, Never>()
     
     var outputListener: ((Reducer.OutputAction) -> Void)?
     fileprivate var routePerformer: AmberRoutePerformer!

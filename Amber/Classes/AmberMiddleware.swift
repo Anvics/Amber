@@ -18,9 +18,9 @@ public protocol AmberMiddleware{
 }
 
 public extension AmberMiddleware{
-    public func process(state: Any, beforeEvent event: Any) { }
+    func process(state: Any, beforeEvent event: Any) { }
     
-    public func perform(event: Any, onState state: Any, route: AmberRoutePerformer, completeEvent: @escaping () -> (), cancelEvent: @escaping () -> ()) { completeEvent() }
+    func perform(event: Any, onState state: Any, route: AmberRoutePerformer, completeEvent: @escaping () -> (), cancelEvent: @escaping () -> ()) { completeEvent() }
     
-    public func process(state: Any, afterEvent event: Any, route: AmberRoutePerformer){ }
+    func process(state: Any, afterEvent event: Any, route: AmberRoutePerformer){ }
 }

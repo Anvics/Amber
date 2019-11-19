@@ -24,7 +24,7 @@ public protocol AmberAppStore: AmberAppStoreBase {
 }
 
 public extension AmberAppStore{
-    public func perform(action: Reducer.Action){
+    func perform(action: Reducer.Action){
         initiateChangeState(action: action) { (state, isCancelled, actionPerf) in
             self.reducer.reduce(action: action, state: state, isCancelled: isCancelled, performAction: actionPerf)
         }

@@ -38,37 +38,37 @@ public extension AmberController{
     typealias InputActionListener = (Reducer.InputAction) -> Void
     typealias OutputActionListener = (Reducer.OutputAction) -> Void
     
-    public func initialize(with data: Reducer.State.RequiredData){
+    func initialize(with data: Reducer.State.RequiredData){
         store.initialize(with: data, routePerformer: AmberRoutePerformerImplementation(controller: self, embedder: self))
     }
     
-    public func perform(action: Reducer.Action){
+    func perform(action: Reducer.Action){
         store.perform(action: action)
     }
     
-    public func perform(transitions: Reducer.Transition...){
+    func perform(transitions: Reducer.Transition...){
         transitions.forEach(store.perform)
     }
     
-    public func perform(outputAction: Reducer.OutputAction){
+    func perform(outputAction: Reducer.OutputAction){
         store.performOutput(action: outputAction)
     }
     
-    public func field<T: Equatable>(extract: @escaping (Reducer.State) -> T) -> Signal<T, NoError>{
-        return state.map(extract).distinct()
+    func field<T: Equatable>(_ extract: @escaping (Reducer.State) -> T) -> Signal<T, Never>{
+        return state.map(extract).distinctUntilChanged()
     }
     
-    public var action: Subject<Reducer.Action, NoError> { return store.action }
-    public var outputAction: Subject<Reducer.OutputAction, NoError> { return store.outputAction }
-    public var transition: Subject<Reducer.Transition, NoError> { return store.transition }
+    public var action: Subject<Reducer.Action, Never> { return store.action }
+    public var outputAction: Subject<Reducer.OutputAction, Never> { return store.outputAction }
+    public var transition: Subject<Reducer.Transition, Never> { return store.transition }
     
-    public var state: Signal<Reducer.State, NoError> { return store.state }
+    public var state: Signal<Reducer.State, Never> { return store.state }
     
     public var currentState: Reducer.State { return store.currentState() }
 }
 
 public extension AmberController where Reducer.State.RequiredData == Void{
-    public func initialize(){
+    func initialize(){
         store.initialize(with: (), routePerformer: AmberRoutePerformerImplementation(controller: self, embedder: self))
     }
 }
@@ -78,26 +78,26 @@ infix operator ~>
 infix operator *>
 
 public func *><T: AmberController>(left: (T, UIButton), right: T.Reducer.Action){
-    left.1.reactive.tap.replace(with: right).bind(to: left.0.action)
+    left.1.reactive.tap.replaceElements(with: right).bind(to: left.0.action)
 }
 
-public func *><T: AmberController, R>(left: (T, Signal<R, NoError>), right: T.Reducer.Action){
-    left.1.replace(with: right).bind(to: left.0.action)
+public func *><T: AmberController, R>(left: (T, Signal<R, Never>), right: T.Reducer.Action){
+    left.1.replaceElements(with: right).bind(to: left.0.action)
 }
 
-public func *><T: AmberController, R>(left: (T, Signal<R, NoError>), right: @escaping (R) -> T.Reducer.Action){
+public func *><T: AmberController, R>(left: (T, Signal<R, Never>), right: @escaping (R) -> T.Reducer.Action){
     left.1.map(right).bind(to: left.0.action)
 }
 
 
 public func ~><T: AmberController>(left: (T, UIButton), right: T.Reducer.Transition){
-    left.1.reactive.tap.replace(with: right).bind(to: left.0.transition)
+    left.1.reactive.tap.replaceElements(with: right).bind(to: left.0.transition)
 }
 
-public func ~><T: AmberController, R>(left: (T, Signal<R, NoError>), right: T.Reducer.Transition){
-    left.1.replace(with: right).bind(to: left.0.transition)
+public func ~><T: AmberController, R>(left: (T, Signal<R, Never>), right: T.Reducer.Transition){
+    left.1.replaceElements(with: right).bind(to: left.0.transition)
 }
 
-public func ~><T: AmberController, R>(left: (T, Signal<R, NoError>), right: @escaping (R) -> T.Reducer.Transition){
+public func ~><T: AmberController, R>(left: (T, Signal<R, Never>), right: @escaping (R) -> T.Reducer.Transition){
     left.1.map(right).bind(to: left.0.transition)
 }
