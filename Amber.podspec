@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'Amber'
-  s.version          = '2.1.2'
+  s.version          = '2.1.3'
   s.summary          = 'flexible and convenient iOS architecture based on Flex & Elm'
 
 # This description is used to generate tags and improve search results.
@@ -29,7 +29,7 @@ s.source           = { :git => 'https://github.com/Anvics/Amber.git', :tag => s.
 # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
 
 s.ios.deployment_target = '10.0'
-#s.swift-version = '4.2'
+s.swift_version = '4.2'
 
 s.source_files = 'Amber/Classes/**/*'
 
@@ -39,5 +39,5 @@ s.source_files = 'Amber/Classes/**/*'
 
   # s.public_header_files = 'Pod/Classes/**/*.h'
   s.frameworks = 'UIKit'
-  s.dependency 'Bond', '~> 7.2.0'
+  s.dependency 'Bond'
 end

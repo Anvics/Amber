@@ -2,7 +2,7 @@ use_frameworks!
 
 target 'Amber_Tests' do
   pod 'Amber', :path => '../'
-pod 'Bond', '~> 7.2.0'
+pod 'Bond'
   
   
 end
